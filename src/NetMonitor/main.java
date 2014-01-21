@@ -29,13 +29,13 @@ import com.mysql.*;
 public class main {
 
     
-	 public static void main(String[] args) {
+	 public static void main(String[] args) throws SQLException {
 	        Get t = new Get();
 	        FindDevice f = new FindDevice();
 	        GetNext n = new GetNext();
 	        SetChar s = new SetChar();
 	        InterfaceInfo i = new InterfaceInfo();
-	        connect conn = new connect();
+
 	    	int ip1 = 192;
 	    	int ip2 = 168;
 	    	int ip3 = 110;
@@ -45,14 +45,7 @@ public class main {
 	    	String IP;
 	        try {
 	            try {
-	        	try
-			    {
-				conn.connectdb();
-			    } catch (SQLException e)
-			    {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			    }
+
 	              //  n.start();
 	                IP = "udp:"+ip1+"."+ip2+"."+ip3+"."+ip4+"/"+port;
 

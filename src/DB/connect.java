@@ -15,7 +15,7 @@ public class connect
 	{
 	    Connection connection;
 	    
-	    String driverName = "com.mysql.jdbc.Driver"; 
+	   // String driverName = "com.mysql.jdbc.Driver"; 
 
 		//Class.forName(driverName);
 
