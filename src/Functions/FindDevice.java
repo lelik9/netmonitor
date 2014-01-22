@@ -19,6 +19,7 @@ public class FindDevice
 		    throws IOException, SQLException
 		    {
 		        Get t = new Get();
+		        InterfaceInfo i = new InterfaceInfo();
 		        connect con =new connect();
 		        
 		        String IP;		        
@@ -26,11 +27,6 @@ public class FindDevice
 		        Statement stmt = connection.createStatement();
 		        
 			
-		/*	String dbtime;
-			while (rs.next()) {
-				dbtime = rs.getString(1);
-				System.out.println(dbtime);
-			}*/
 			
 		        int wildcard=255-mask;
 		        int tmpIP4=wildcard;
@@ -81,6 +77,8 @@ public class FindDevice
 		            {
 		        	System.out.println("Device name: "+Name1);
 
+		        	//i.GetIntInfo(ip1, ip2, ip3, ip4, port);
+		        	
 		        	t.get(IP,sysDescr);
 		        	String descr=t.getGetChar();
 		        	System.out.println("Device description: "+Name);
@@ -92,9 +90,20 @@ public class FindDevice
 		        	String mac=t.getGetChar();		  
 		        	System.out.println("Device Mac address: "+Name);
 		        	
-			        String name = "INSERT INTO devices VALUES ('"+Name1+"','"+descr+"','"+IPtmp+"','"+mac+"','null')";
-			        System.out.println("to DB: "+name);
-				stmt.executeUpdate(name);
+		        	String infsel = "SELECT DeviceName FROM devices WHERE DeviceName = '"+Name1+"'";
+		        	boolean res = stmt.execute(infsel);
+
+		          	if(res==false)
+		        	    {
+		        		String info = "INSERT INTO devices VALUES ('"+Name1+"','"+descr+"','"+IPtmp+"','"+mac+"','null')";
+		        		stmt.executeUpdate(info);
+		        	    }
+		        	
+		        	
+		        	String TableCreate = "CREATE TABLE IF NOT EXISTS "+Name1+" (interface VARCHAR(25), status VARCHAR(6), ip VARCHAR(20), mac VARCHAR(30), PRIMARY KEY ( interface ))";
+				stmt.executeUpdate(TableCreate);
+				
+				i.GetIntInfo(ip1, ip2, ip3, ip4, port, Name1);
 
 		            }
 		            
@@ -102,6 +111,8 @@ public class FindDevice
 		            ip4++;
 		            
 		    	}
+		    	
+		    	connection.close();
 		    	
 		    }
 

@@ -82,13 +82,16 @@ public class Get implements ResponseListener {
 
             send(t, OID);
         
-        while (!requests.isEmpty()) {
+        while (!requests.isEmpty()) 
+            {
             try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        } 
+        		Thread.sleep(100);
+                }
+            catch (InterruptedException e) 
+        	{
+        	    e.printStackTrace();
+        	}
+            } 
 
     }
     

@@ -39,7 +39,7 @@ public class main {
 	    	int ip1 = 192;
 	    	int ip2 = 168;
 	    	int ip3 = 110;
-	    	int ip4 = 28;
+	    	int ip4 = 17;
 	    	int port = 161;
 	    	int mask=224;
 	    	String IP;
@@ -51,7 +51,7 @@ public class main {
 
 	               // String OID="1.3.6.1.2.1.4.22.1.3";
 	              //  String OID2="1.3.6.1.2.1.17.4.3.1.1";
-	            //	n.GetNext(IP, OID, OID2);
+
 	               f.FindDevice(ip1,ip2,ip3,ip4,mask,port);
 
 	              // i.GetIntInfo(ip1, ip2, ip3, ip4, port);
