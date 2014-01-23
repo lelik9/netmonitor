@@ -11,7 +11,7 @@ import java.sql.SQLException;
 
 public class connect 
     {
-	public Connection connectdb() throws SQLException, IOException
+	public Connection connectdb(String mydatabase) throws SQLException, IOException
 	{
 	    Connection connection;
 	    
@@ -21,7 +21,7 @@ public class connect
 
 		// Create a connection to the database
 		String serverName = "localhost";
-		String mydatabase = "monitor_db";
+		//String mydatabase = "monitor_db";
 		String url = "jdbc:mysql://" + serverName + "/" + mydatabase;
 		String username = "root";
 		String password = "[Al_F]";

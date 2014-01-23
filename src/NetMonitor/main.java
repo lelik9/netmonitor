@@ -18,6 +18,7 @@ import org.snmp4j.transport.DefaultUdpTransportMapping;
 import SNMP.Get;
 import SNMP.GetNext;
 import DB.connect;
+import Functions.ExtIntInfo;
 import Functions.FindDevice;
 import Functions.InterfaceInfo;
 import Functions.SetIntParam;
@@ -35,6 +36,7 @@ public class main {
 	        GetNext n = new GetNext();
 	        SetChar s = new SetChar();
 	        InterfaceInfo i = new InterfaceInfo();
+	        ExtIntInfo ex =new ExtIntInfo();
 
 	    	int ip1 = 192;
 	    	int ip2 = 168;
@@ -55,7 +57,7 @@ public class main {
 	               f.FindDevice(ip1,ip2,ip3,ip4,mask,port);
 
 	              // i.GetIntInfo(ip1, ip2, ip3, ip4, port);
-
+	               // ex.ExtIntInfo(IP);
 	            } finally {
 	                t.stop();
 	            }

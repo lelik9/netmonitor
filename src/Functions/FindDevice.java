@@ -2,6 +2,7 @@ package Functions;
 
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -14,6 +15,7 @@ import SNMP.Get;
 
 public class FindDevice 
 {
+    private PreparedStatement preparedStatement = null;
 	
 	public void FindDevice(int ip1, int ip2,int ip3,int ip4,int mask,int port)
 		    throws IOException, SQLException
@@ -21,25 +23,37 @@ public class FindDevice
 		        Get t = new Get();
 		        InterfaceInfo i = new InterfaceInfo();
 		        connect con =new connect();
+		        t.start();
 		        
-		        String IP;		        
-		        Connection connection = con.connectdb();
+		        
+		        Connection connection = con.connectdb("monitor_db");//Connect to main base
 		        Statement stmt = connection.createStatement();
+		        Connection connect = con.connectdb("mib_db");//Connect to OID base
 		        
-			
-			
+					
 		        int wildcard=255-mask;
 		        int tmpIP4=wildcard;
 		        int tmp=0;
+		        int k=1;
 		        String Name;
-
-
-		        String sysName= "1.3.6.1.2.1.1.5.0";
-		        String sysDescr= "1.3.6.1.2.1.1.1.0";
+		        String IP;
 		        
-		        String ifPhysAddress="1.3.6.1.2.1.2.2.1.6";
-		       // String IntCount= "1.3.6.1.2.1.2.1.0";
+		        //Reading OID from base
+		        preparedStatement = connect.prepareStatement("SELECT oid FROM public_oid WHERE object = ?");
+
+		        preparedStatement.setString(1,"sysName");
+		        ResultSet res = preparedStatement.executeQuery();
+		        res.next(); String sysName = res.getString(1);
 		        
+		        preparedStatement.setString(1, "sysDescr");
+		        res = preparedStatement.executeQuery();
+		        res.next(); String sysDescr = res.getString(1);
+		        
+		        preparedStatement.setString(1, "ifPhysAddress");
+		        res = preparedStatement.executeQuery();
+		        res.next(); String ifPhysAddress = res.getString(1);
+
+		        //Checking for subnet
 	        	if(ip4<wildcard)
 	        	    {
 	        		ip4=1;
@@ -57,7 +71,7 @@ public class FindDevice
 		            }
 	        		}
 		        System.out.println("tmpIP: "+tmpIP4+" ip4= "+ip4);
-		  	t.start();
+		 
   
 	                Name=t.getGetChar();
 		    	while(tmp<wildcard-1)
@@ -76,9 +90,8 @@ public class FindDevice
 		            if(Name!=null)
 		            {
 		        	System.out.println("Device name: "+Name1);
-
-		        	//i.GetIntInfo(ip1, ip2, ip3, ip4, port);
 		        	
+		        	//Get information of devices in network
 		        	t.get(IP,sysDescr);
 		        	String descr=t.getGetChar();
 		        	System.out.println("Device description: "+Name);
@@ -90,21 +103,41 @@ public class FindDevice
 		        	String mac=t.getGetChar();		  
 		        	System.out.println("Device Mac address: "+Name);
 		        	
-		        	String infsel = "SELECT DeviceName FROM devices WHERE DeviceName = '"+Name1+"'";
-		        	boolean res = stmt.execute(infsel);
+		        	String Sel = "SELECT DeviceName FROM devices WHERE DeviceName = '"+Name1+"'";
+		        	/*preparedStatement = connection.prepareStatement("SELECT ? FROM ? WHERE ? = ?");
+		        	preparedStatement.setString(1, "DeviceName");
+		        	preparedStatement.setString(2, "devices");
+		        	preparedStatement.setString(3, "DeviceName");
+		        	preparedStatement.setString(4, Name1);
+		        	boolean res = preparedStatement.execute();*/
+		        	res = stmt.executeQuery(Sel);
 
-		          	if(res==false)
+		        	if(res.next()==false)
 		        	    {
-		        		String info = "INSERT INTO devices VALUES ('"+Name1+"','"+descr+"','"+IPtmp+"','"+mac+"','null')";
+		        		String info = "INSERT INTO devices VALUES ('"+Name1+"','"+IPtmp+"','"+mac+"','null','"+descr+"')";
 		        		stmt.executeUpdate(info);
 		        	    }
 		        	
-		        	
-		        	String TableCreate = "CREATE TABLE IF NOT EXISTS "+Name1+" (interface VARCHAR(25), status VARCHAR(6), ip VARCHAR(20), mac VARCHAR(30), PRIMARY KEY ( interface ))";
+		          	
+		        	String TableCreate = "CREATE TABLE IF NOT EXISTS dev"+k+"Int (interface VARCHAR(100), status VARCHAR(6), ip VARCHAR(20), mac VARCHAR(30), PRIMARY KEY ( interface ))";
 				stmt.executeUpdate(TableCreate);
 				
-				i.GetIntInfo(ip1, ip2, ip3, ip4, port, Name1);
+				
+		        	/*preparedStatement.setString(1, "tableName");
+		        	preparedStatement.setString(2, "tablesname");
+		        	preparedStatement.setString(3, "tableName");
+		        	preparedStatement.setString(4, Name1);*/
+		        	Sel = "SELECT DeviceName FROM tablesname WHERE DeviceName = '"+Name1+"'";
+		        	res = stmt.executeQuery(Sel);
 
+		        	if(res.next()==false)
+		        	    {
+		        		String AboutTable = "INSERT INTO tablesname VALUES ('"+Name1+"','dev"+k+"Int', '','')";
+		        		stmt.executeUpdate(AboutTable);
+		        	    }
+				
+				i.GetIntInfo(ip1, ip2, ip3, ip4, port, "dev"+k+"Int");
+				k++;
 		            }
 		            
 		            tmp++;

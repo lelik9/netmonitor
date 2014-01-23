@@ -35,7 +35,7 @@ public class InterfaceInfo
         n.start();
         t.start();
         
-        Connection connection = con.connectdb();
+        Connection connection = con.connectdb("monitor_db");
         Statement stmt = connection.createStatement();
         
 	
