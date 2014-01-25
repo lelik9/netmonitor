@@ -41,7 +41,7 @@ public class main {
 	    	int ip1 = 192;
 	    	int ip2 = 168;
 	    	int ip3 = 110;
-	    	int ip4 = 17;
+	    	int ip4 = 20;
 	    	int port = 161;
 	    	int mask=224;
 	    	String IP;

@@ -11,6 +11,7 @@ import org.snmp4j.smi.OctetString;
 
 import DB.connect;
 import SNMP.Get;
+import SNMP.GetNext;
 
 
 public class FindDevice 
@@ -21,9 +22,11 @@ public class FindDevice
 		    throws IOException, SQLException
 		    {
 		        Get t = new Get();
+		        GetNext n = new GetNext();
 		        InterfaceInfo i = new InterfaceInfo();
 		        connect con =new connect();
 		        t.start();
+		        n.start();
 		        
 		        
 		        Connection connection = con.connectdb("monitor_db");//Connect to main base
@@ -44,14 +47,22 @@ public class FindDevice
 		        preparedStatement.setString(1,"sysName");
 		        ResultSet res = preparedStatement.executeQuery();
 		        res.next(); String sysName = res.getString(1);
+		        String sysNameOID = sysName;
 		        
 		        preparedStatement.setString(1, "sysDescr");
 		        res = preparedStatement.executeQuery();
 		        res.next(); String sysDescr = res.getString(1);
+		        String sysDescrOID = sysDescr;
 		        
 		        preparedStatement.setString(1, "ifPhysAddress");
 		        res = preparedStatement.executeQuery();
 		        res.next(); String ifPhysAddress = res.getString(1);
+		        String ifPhysAddressOID = ifPhysAddress;
+		        
+		        preparedStatement.setString(1, "ipAdEntIfIndex");
+		        res = preparedStatement.executeQuery();
+		        res.next(); String ipAdEntIfIndex = res.getString(1);
+		        String ipAdEntIfIndexOID = ipAdEntIfIndex;
 
 		        //Checking for subnet
 	        	if(ip4<wildcard)
@@ -72,35 +83,35 @@ public class FindDevice
 	        		}
 		        System.out.println("tmpIP: "+tmpIP4+" ip4= "+ip4);
 		 
-  
-	                Name=t.getGetChar();
+  	                
 		    	while(tmp<wildcard-1)
 		    	{
-		    	    String IPtmp = ip1+"."+ip2+"."+ip3+"."+ip4;
-		    	    String ipAdEntIfIndex="1.3.6.1.2.1.4.20.1.2."+IPtmp;
-		    	    
+		    	    String IPtmp = ip1+"."+ip2+"."+ip3+"."+ip4;    	    
 		    	    IP = "udp:"+ip1+"."+ip2+"."+ip3+"."+ip4+"/"+port;
 		    	    System.out.println(IP);
-		    		
-		            t.get(IP,sysName);
-      
-		            Name=t.getGetChar();
-		            String Name1 = Name;
+		    	    
+                            t.get(IP,sysName);
+                            Name=t.getGetChar();
+                            String Name1 = Name;
 
 		            if(Name!=null)
 		            {
 		        	System.out.println("Device name: "+Name1);
 		        	
 		        	//Get information of devices in network
-		        	t.get(IP,sysDescr);
-		        	String descr=t.getGetChar();
+		                n.GetNext(IP,sysDescrOID,sysDescr);  //Get interface description
+		                String descr=n.getChar();
+		              //  String descr = Name;
+		                sysDescrOID = n.getNextOID();
 		        	System.out.println("Device description: "+Name);
 		            
-		        	t.get(IP,ipAdEntIfIndex);
-		        	Name=t.getGetChar();		  
-		        	
-		        	t.get(IP,ifPhysAddress+"."+Name);
-		        	String mac=t.getGetChar();		  
+		                n.GetNext(IP,ipAdEntIfIndexOID,ipAdEntIfIndex);  //Get interface index
+		                String ind=n.getChar();
+		                ipAdEntIfIndexOID = n.getNextOID();
+		                System.out.println("-> "+ind);
+		                n.GetNext(IP,ifPhysAddress+"."+ind,ifPhysAddress);  //Get interface mac
+		                String mac=n.getChar();
+		               // String mac = Name; 
 		        	System.out.println("Device Mac address: "+Name);
 		        	
 		        	String Sel = "SELECT DeviceName FROM devices WHERE DeviceName = '"+Name1+"'";
@@ -114,12 +125,12 @@ public class FindDevice
 
 		        	if(res.next()==false)
 		        	    {
-		        		String info = "INSERT INTO devices VALUES ('"+Name1+"','"+IPtmp+"','"+mac+"','null','"+descr+"')";
+		        		String info = "UPDATE devices SET DeviceName='"+Name1+"',IPaddress='"+IPtmp+"',MACaddress='"+mac+"',Description='"+descr+"'";
 		        		stmt.executeUpdate(info);
 		        	    }
 		        	
 		          	
-		        	String TableCreate = "CREATE TABLE IF NOT EXISTS dev"+k+"Int (interface VARCHAR(100), status VARCHAR(6), ip VARCHAR(20), mac VARCHAR(30), PRIMARY KEY ( interface ))";
+		        	String TableCreate = "CREATE TABLE IF NOT EXISTS dev"+k+"Int (interface VARCHAR(100), status VARCHAR(6), ip VARCHAR(20),Vlan VARCHAR(15) ,mac VARCHAR(30), PRIMARY KEY ( interface ))";
 				stmt.executeUpdate(TableCreate);
 				
 				

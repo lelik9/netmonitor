@@ -25,7 +25,7 @@ public class GetNext implements ResponseListener {
 
     private final static String SNMP_COMMUNITY = "public";
     private final static int    SNMP_RETRIES   = 1;
-    private final static long   SNMP_TIMEOUT   = 1000;
+    private final static long   SNMP_TIMEOUT   = 1500;
 
     
     private Snmp snmp = null;
@@ -75,20 +75,21 @@ public class GetNext implements ResponseListener {
         if(response.get(0).getOid().startsWith(new OID(getCheckOID()))!=false)
         	    {
         		setChar(response.get(0).toValueString());
-        	//	System.out.println(response.get(0).toValueString());
+        	//	System.out.println(response.get(0).toString());
         		
         		setNextOID(response.get(0).getOid().toString());
         	//	System.out.println(response.get(0).getOid().toString());
         	    }  else 
         		{
         		    setChar(null);
-        		}
+        		} 	       
+            
         
 
         synchronized (requests) 
         {
             requests.remove(requestId);
-        }
+        } 
             
     }
     

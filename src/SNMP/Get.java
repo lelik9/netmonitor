@@ -28,7 +28,7 @@ public class Get implements ResponseListener {
     
     private final static String SNMP_COMMUNITY = "public";
     private final static int    SNMP_RETRIES   = 1;
-    private final static long   SNMP_TIMEOUT   = 100;
+    private final static long   SNMP_TIMEOUT   = 200;
     
     private Snmp snmp = null;
     private TransportMapping transport = null;
