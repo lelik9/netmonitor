@@ -18,7 +18,7 @@ public class FindDevice
 {
     private PreparedStatement preparedStatement = null;
 	
-	public void FindDevice(int ip1, int ip2,int ip3,int ip4,int mask,int port)
+	public void FindDevice(int ip1, int ip2,int ip3,int ip4,int mask,int port, String community)
 		    throws IOException, SQLException
 		    {
 		        Get t = new Get();
@@ -31,6 +31,7 @@ public class FindDevice
 		        
 		        Connection connection = con.connectdb("monitor_db");//Connect to main base
 		        Statement stmt = connection.createStatement();
+		        
 		        Connection connect = con.connectdb("mib_db");//Connect to OID base
 		        
 					
@@ -63,6 +64,7 @@ public class FindDevice
 		        res = preparedStatement.executeQuery();
 		        res.next(); String ipAdEntIfIndex = res.getString(1);
 		        String ipAdEntIfIndexOID = ipAdEntIfIndex;
+		        
 
 		        //Checking for subnet
 	        	if(ip4<wildcard)
@@ -99,17 +101,17 @@ public class FindDevice
 		        	System.out.println("Device name: "+Name1);
 		        	
 		        	//Get information of devices in network
-		                n.GetNext(IP,sysDescrOID,sysDescr);  //Get interface description
+		                n.GetNext(IP,sysDescrOID,sysDescr, community);  //Get interface description
 		                String descr=n.getChar();
 		              //  String descr = Name;
 		                sysDescrOID = n.getNextOID();
 		        	System.out.println("Device description: "+Name);
 		            
-		                n.GetNext(IP,ipAdEntIfIndexOID,ipAdEntIfIndex);  //Get interface index
+		                n.GetNext(IP,ipAdEntIfIndexOID,ipAdEntIfIndex, community);  //Get interface index
 		                String ind=n.getChar();
 		                ipAdEntIfIndexOID = n.getNextOID();
 		                System.out.println("-> "+ind);
-		                n.GetNext(IP,ifPhysAddress+"."+ind,ifPhysAddress);  //Get interface mac
+		                n.GetNext(IP,ifPhysAddress+"."+ind,ifPhysAddress, community);  //Get interface mac
 		                String mac=n.getChar();
 		               // String mac = Name; 
 		        	System.out.println("Device Mac address: "+Name);
@@ -127,27 +129,9 @@ public class FindDevice
 		        	    {
 		        		String info = "UPDATE devices SET DeviceName='"+Name1+"',IPaddress='"+IPtmp+"',MACaddress='"+mac+"',Description='"+descr+"'";
 		        		stmt.executeUpdate(info);
-		        	    }
-		        	
-		          	
-		        	String TableCreate = "CREATE TABLE IF NOT EXISTS dev"+k+"Int (interface VARCHAR(100), status VARCHAR(6), ip VARCHAR(20),Vlan VARCHAR(15) ,mac VARCHAR(30), PRIMARY KEY ( interface ))";
-				stmt.executeUpdate(TableCreate);
+		        	    }		        	
 				
-				
-		        	/*preparedStatement.setString(1, "tableName");
-		        	preparedStatement.setString(2, "tablesname");
-		        	preparedStatement.setString(3, "tableName");
-		        	preparedStatement.setString(4, Name1);*/
-		        	Sel = "SELECT DeviceName FROM tablesname WHERE DeviceName = '"+Name1+"'";
-		        	res = stmt.executeQuery(Sel);
-
-		        	if(res.next()==false)
-		        	    {
-		        		String AboutTable = "INSERT INTO tablesname VALUES ('"+Name1+"','dev"+k+"Int', '','')";
-		        		stmt.executeUpdate(AboutTable);
-		        	    }
-				
-				i.GetIntInfo(ip1, ip2, ip3, ip4, port, "dev"+k+"Int");
+				i.GetIntInfo(Name1);
 				k++;
 		            }
 		            
@@ -156,7 +140,8 @@ public class FindDevice
 		            
 		    	}
 		    	
-		    	connection.close();
+		        connect.close();
+		        connection.close();
 		    	
 		    }
 

@@ -34,9 +34,20 @@ public class GetNext implements ResponseListener {
     private String NextOID;
     private String Char;
     private static String CheckOID;
+    private static String Com;
     
     private Set<Integer32> requests = new HashSet<Integer32>();
-    
+
+    public static String getCom()
+	{
+		return Com;
+	}
+
+    public static void setCom(String com)
+	{
+		Com = com;
+	}
+
     public static String getCheckOID()
         {
     	return CheckOID;
@@ -67,11 +78,12 @@ public class GetNext implements ResponseListener {
 		NextOID = nextOID;
 	}
 
+
     public void onResponse(ResponseEvent event) 
 	{
         Integer32 requestId = event.getRequest().getRequestID();
         PDU response = event.getResponse();
-
+      //  System.out.println(response.get(0).toString());
         if(response.get(0).getOid().startsWith(new OID(getCheckOID()))!=false)
         	    {
         		setChar(response.get(0).toValueString());
@@ -93,9 +105,11 @@ public class GetNext implements ResponseListener {
             
     }
     
-    public void GetNext(String IP, String OID1, String CheckOID) throws IOException {
-        Target t = getTarget(IP);
+    public void GetNext(String IP, String OID1, String CheckOID, String community) throws IOException
+    {
         setCheckOID(CheckOID);
+        setCom(community);
+        Target t = getTarget(IP);
         send(t, OID1);
     }
     
@@ -118,7 +132,7 @@ public class GetNext implements ResponseListener {
     private Target getTarget(String address) {
         Address targetAddress = GenericAddress.parse(address);
         CommunityTarget target = new CommunityTarget();
-        target.setCommunity(new OctetString(SNMP_COMMUNITY));
+        target.setCommunity(new OctetString(getCom()));
         target.setAddress(targetAddress);
         target.setRetries(SNMP_RETRIES);
         target.setTimeout(SNMP_TIMEOUT);
