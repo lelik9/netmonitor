@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import DB.connect;
 import SNMP.*;
@@ -13,7 +14,7 @@ public class ExtIntInfo
     {
 	private PreparedStatement preparedStatement = null;
 	
-	public void ExtIntInfo(String IP) throws IOException, SQLException
+	public void ExtIntInfo(String device) throws IOException, SQLException
 	    {
 		String Char="";
 		
@@ -22,6 +23,8 @@ public class ExtIntInfo
 	        n.start();
 	        
 	     //   IP=IP+"/161";
+	        Connection connect = con.connectdb("monitor_db");//Connect to main base
+	        Statement stmt = connect.createStatement();
 	        
 	        Connection connection = con.connectdb("mib_db");//Connect to OID base
 
@@ -88,23 +91,38 @@ public class ExtIntInfo
 	        res.next(); String ifOutErrors = res.getString(1);
 	        String ifOutErrorsOID = ifOutErrors;
 	        
+	        //Reading device IP from main base
+	        String sel = "SELECT IPaddress FROM devices WHERE DeviceName='"+device+"'";
+	        res = stmt.executeQuery(sel);
+	        res.next(); String IP = res.getString(1);
+	        
+		sel = "SELECT Community FROM Devices WHERE DeviceName = '"+device+"'";
+		res = stmt.executeQuery(sel);
+		res.next(); String community = res.getString(1);
+		
+		sel = "SELECT Port FROM Devices WHERE DeviceName = '"+device+"'";
+		res = stmt.executeQuery(sel);
+		res.next(); String port = res.getString(1);
+
+	        IP = "udp:"+IP+"/"+port;//Set address of device (CHANGE PORT)
+	        
 	        //Geting info from hardware
 	        while(Char!=null)
 	            {
-	        	n.GetNext(IP,ifDescrOID,ifDescr);  //Get interface Name
+	        	n.GetNext(IP,ifDescrOID,ifDescr, community);  //Get interface Name
 	        	Char=n.getChar();
 	        	ifDescrOID = n.getNextOID();
 	        	//if(Char.equals("Null0"))return;
 	        	if(Char==null)break;	        	
 	        	System.out.println(Char);
 	        	
-	        	n.GetNext(IP,ifMtuOID,ifMtu);  //Get interface MTU
+	        	n.GetNext(IP,ifMtuOID,ifMtu, community);  //Get interface MTU
 	        	String Mtu = n.getChar();
 	        	if(Mtu == null) Mtu="";
 	        	ifMtuOID = n.getNextOID();
 	        	System.out.println(Mtu);
 	        	
-	        	n.GetNext(IP,ifSpeedOID,ifSpeed);  //Get interface Speed
+	        	n.GetNext(IP,ifSpeedOID,ifSpeed, community);  //Get interface Speed
 	        	String Speed = n.getChar();
 	        	//int sp = Integer.parseInt(Speed)/1000000;
 	        	//Speed = Integer.toString(sp);
@@ -112,55 +130,55 @@ public class ExtIntInfo
 	        	ifSpeedOID = n.getNextOID();
 	        	System.out.println(Speed);
 	        	
-	        	n.GetNext(IP,ifLastChangeOID, ifLastChange);  //Get interface time of last status change
+	        	n.GetNext(IP,ifLastChangeOID, ifLastChange, community);  //Get interface time of last status change
 	        	String LastChange = n.getChar();
 	        	if(LastChange == null) Mtu="";
 	        	ifLastChangeOID = n.getNextOID();
 	        	System.out.println(LastChange);
 	        	
-	        	n.GetNext(IP,ifInUcastPktsOID,ifInUcastPkts);  //Get interface in unicast packets
+	        	n.GetNext(IP,ifInUcastPktsOID,ifInUcastPkts, community);  //Get interface in unicast packets
 	        	String InUcastPkts = n.getChar();
 	        	if(InUcastPkts == null) InUcastPkts="";
 	        	ifInUcastPktsOID = n.getNextOID();
 	        	System.out.println(InUcastPkts);
 	        	
-	        	n.GetNext(IP,ifInNUcastPktsOID,ifInNUcastPkts);  //Get interface in non unicast packets
+	        	n.GetNext(IP,ifInNUcastPktsOID,ifInNUcastPkts, community);  //Get interface in non unicast packets
 	        	String InNUcastPkts = n.getChar();
 	        	if(InNUcastPkts == null) InNUcastPkts="";
 	        	ifInNUcastPktsOID = n.getNextOID();
 	        	System.out.println(InNUcastPkts);
 	        	
-	        	n.GetNext(IP,ifInDiscardsOID,ifInDiscards);  //Get interface in discards
+	        	n.GetNext(IP,ifInDiscardsOID,ifInDiscards, community);  //Get interface in discards
 	        	String InDiscards = n.getChar();
 	        	if(InDiscards == null) InDiscards="";
 	        	ifInDiscardsOID = n.getNextOID();
 	        	System.out.println(InDiscards);
 	        	
-	        	n.GetNext(IP,ifInErrorsOID,ifInErrors);  //Get interface in errors
+	        	n.GetNext(IP,ifInErrorsOID,ifInErrors, community);  //Get interface in errors
 	        	String InErrors = n.getChar();
 	        	if(InErrors == null) InErrors="";
 	        	ifInErrorsOID = n.getNextOID();
 	        	System.out.println(InErrors);
 	        	
-	        	n.GetNext(IP,ifOutUcastPktsOID,ifOutUcastPkts);  //Get interface out unicast packets
+	        	n.GetNext(IP,ifOutUcastPktsOID,ifOutUcastPkts, community);  //Get interface out unicast packets
 	        	String OutUcastPkts = n.getChar();
 	        	if(OutUcastPkts == null) OutUcastPkts="";
 	        	ifOutUcastPktsOID = n.getNextOID();
 	        	System.out.println(OutUcastPkts);
 	        	
-	        	n.GetNext(IP,ifOutNUcastPktsOID,ifOutNUcastPkts );  //Get interface out non unicast packets
+	        	n.GetNext(IP,ifOutNUcastPktsOID,ifOutNUcastPkts, community );  //Get interface out non unicast packets
 	        	String OutNUcastPkts = n.getChar();
 	        	if(OutNUcastPkts == null) OutNUcastPkts="";
 	        	ifOutNUcastPktsOID = n.getNextOID();
 	        	System.out.println(OutNUcastPkts);
 	        	
-	        	n.GetNext(IP,ifOutDiscardsOID,ifOutDiscards);  //Get interface out discards
+	        	n.GetNext(IP,ifOutDiscardsOID,ifOutDiscards, community);  //Get interface out discards
 	        	String OutDiscards = n.getChar();
 	        	if(OutDiscards == null) OutDiscards="";
 	        	ifOutDiscardsOID = n.getNextOID();
 	        	System.out.println(OutDiscards);
 	        	
-	        	n.GetNext(IP,ifOutErrorsOID,ifOutErrors);  //Get interface out errors
+	        	n.GetNext(IP,ifOutErrorsOID,ifOutErrors, community);  //Get interface out errors
 	        	String OutErrors = n.getChar();
 	        	if(OutErrors == null) OutErrors="";
 	        	ifOutErrorsOID = n.getNextOID();

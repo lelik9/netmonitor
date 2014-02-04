@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import DB.connect;
+import NetMonitor.main;
 import SNMP.GetNext;
 
 public class VlanTable
@@ -19,13 +20,15 @@ public class VlanTable
 		String Char = "";
 	        connect con = new connect();
 	        GetNext n = new GetNext();
+	        main m = new main();
+	       
 	        n.start();
+
+	        Connection connect1 = m.getConnect1();
+	        Statement stmt1 = connect1.createStatement();
 	        
-	        Connection connect = con.connectdb("monitor_db");//Connect to main base
-	        Statement stmt = connect.createStatement();
-	        
-	        Connection connection = con.connectdb("mib_db");//Connect to OID base
-	        Statement stmt2 = connection.createStatement();
+	        Connection connect2 = m.getConnect2();
+	        Statement stmt2 = connect2.createStatement();
 	        
 	        //Reading OID from base
 	        String sel = "SELECT oid FROM cisco_oid WHERE object = 'vtpVlanName'";	        
@@ -35,21 +38,21 @@ public class VlanTable
 	        
 	        //Reading device IP from main base
 	        sel = "SELECT IPaddress FROM devices WHERE DeviceName='"+device+"'";
-	        res = stmt.executeQuery(sel);
+	        res = stmt1.executeQuery(sel);
 	        res.next(); String IP = res.getString(1);
 	        
 		sel = "SELECT Community FROM Devices WHERE DeviceName = '"+device+"'";
-		res = stmt.executeQuery(sel);
+		res = stmt1.executeQuery(sel);
 		res.next(); String community = res.getString(1);
 		
 		sel = "SELECT Port FROM Devices WHERE DeviceName = '"+device+"'";
-		res = stmt.executeQuery(sel);
+		res = stmt1.executeQuery(sel);
 		res.next(); String port = res.getString(1);
 	        
 	        IP = "udp:"+IP+"/"+port;//Set address of device (CHANGE PORT)
 	        
 	        String TableClear = "DELETE FROM vlantable WHERE DeviceName ='"+device+"'"; //Clear table
-		stmt.execute(TableClear);
+		stmt1.execute(TableClear);
 		
 	        while(Char!=null)
 	            {
@@ -63,7 +66,7 @@ public class VlanTable
         		String num = vtpVlanNameOID.substring(a);
 	        	
 	        	sel = "INSERT INTO vlantable VALUES ('"+device+"', '"+num+"', '"+name+"')";
-	        	stmt.executeUpdate(sel);
+	        	stmt1.executeUpdate(sel);
 	            }
 	    }
     }

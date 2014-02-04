@@ -10,6 +10,7 @@ import java.sql.Statement;
 import org.snmp4j.smi.OctetString;
 
 import DB.connect;
+import NetMonitor.main;
 import SNMP.Get;
 import SNMP.GetNext;
 
@@ -25,25 +26,28 @@ public class FindDevice
 		        GetNext n = new GetNext();
 		        InterfaceInfo i = new InterfaceInfo();
 		        connect con =new connect();
+		        main m = new main();
+		        MacTable mt = new MacTable();
+		        VlanTable vt = new VlanTable();
+		        ArpTable at = new ArpTable();
+		        
 		        t.start();
 		        n.start();
+		        		        
+		        Connection connect1 = m.getConnect1();
+		        Statement stmt1 = connect1.createStatement();
 		        
-		        
-		        Connection connection = con.connectdb("monitor_db");//Connect to main base
-		        Statement stmt = connection.createStatement();
-		        
-		        Connection connect = con.connectdb("mib_db");//Connect to OID base
+		        Connection connect2 = m.getConnect2();
 		        
 					
 		        int wildcard=255-mask;
 		        int tmpIP4=wildcard;
 		        int tmp=0;
-		        int k=1;
 		        String Name;
 		        String IP;
 		        
 		        //Reading OID from base
-		        preparedStatement = connect.prepareStatement("SELECT oid FROM public_oid WHERE object = ?");
+		        preparedStatement = connect2.prepareStatement("SELECT oid FROM public_oid WHERE object = ?");
 
 		        preparedStatement.setString(1,"sysName");
 		        ResultSet res = preparedStatement.executeQuery();
@@ -98,14 +102,14 @@ public class FindDevice
 
 		            if(Name!=null)
 		            {
-		        	System.out.println("Device name: "+Name1);
+		        //	System.out.println("Device name: "+Name1);
 		        	
 		        	//Get information of devices in network
 		                n.GetNext(IP,sysDescrOID,sysDescr, community);  //Get interface description
 		                String descr=n.getChar();
 		              //  String descr = Name;
 		                sysDescrOID = n.getNextOID();
-		        	System.out.println("Device description: "+Name);
+		        	//System.out.println("Device description: "+Name);
 		            
 		                n.GetNext(IP,ipAdEntIfIndexOID,ipAdEntIfIndex, community);  //Get interface index
 		                String ind=n.getChar();
@@ -114,7 +118,7 @@ public class FindDevice
 		                n.GetNext(IP,ifPhysAddress+"."+ind,ifPhysAddress, community);  //Get interface mac
 		                String mac=n.getChar();
 		               // String mac = Name; 
-		        	System.out.println("Device Mac address: "+Name);
+		        //	System.out.println("Device Mac address: "+Name);
 		        	
 		        	String Sel = "SELECT DeviceName FROM devices WHERE DeviceName = '"+Name1+"'";
 		        	/*preparedStatement = connection.prepareStatement("SELECT ? FROM ? WHERE ? = ?");
@@ -123,16 +127,19 @@ public class FindDevice
 		        	preparedStatement.setString(3, "DeviceName");
 		        	preparedStatement.setString(4, Name1);
 		        	boolean res = preparedStatement.execute();*/
-		        	res = stmt.executeQuery(Sel);
+		        	res = stmt1.executeQuery(Sel);
 
 		        	if(res.next()==false)
 		        	    {
 		        		String info = "UPDATE devices SET DeviceName='"+Name1+"',IPaddress='"+IPtmp+"',MACaddress='"+mac+"',Description='"+descr+"'";
-		        		stmt.executeUpdate(info);
+		        		stmt1.executeUpdate(info);
 		        	    }		        	
 				
 				i.GetIntInfo(Name1);
-				k++;
+				vt.VlanTable(Name1);
+				at.GetArp(Name1);
+				mt.MacTable(Name1);
+				
 		            }
 		            
 		            tmp++;
@@ -140,8 +147,7 @@ public class FindDevice
 		            
 		    	}
 		    	
-		        connect.close();
-		        connection.close();
+
 		    	
 		    }
 

@@ -85,7 +85,7 @@ public class Get implements ResponseListener {
         while (!requests.isEmpty()) 
             {
             try {
-        		Thread.sleep(100);
+        		Thread.sleep(200);
                 }
             catch (InterruptedException e) 
         	{

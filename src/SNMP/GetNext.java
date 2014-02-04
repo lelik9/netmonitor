@@ -24,7 +24,7 @@ public class GetNext implements ResponseListener {
 
 
     private final static String SNMP_COMMUNITY = "public";
-    private final static int    SNMP_RETRIES   = 1;
+    private final static int    SNMP_RETRIES   = 3;
     private final static long   SNMP_TIMEOUT   = 1500;
 
     
@@ -83,7 +83,7 @@ public class GetNext implements ResponseListener {
 	{
         Integer32 requestId = event.getRequest().getRequestID();
         PDU response = event.getResponse();
-      //  System.out.println(response.get(0).toString());
+     //   System.out.println(response.get(0).toString());
         if(response.get(0).getOid().startsWith(new OID(getCheckOID()))!=false)
         	    {
         		setChar(response.get(0).toValueString());
@@ -114,14 +114,12 @@ public class GetNext implements ResponseListener {
     }
     
     private void send(Target target, String oid1) throws IOException {
-        PDU pdu = new PDU();
-
-
+            PDU pdu = new PDU();
+            
             pdu.add(new VariableBinding(new OID(oid1)));    
-
             pdu.setType(PDU.GETNEXT);
 
-            ResponseEvent event = snmp.send(pdu, target, null);
+            ResponseEvent event = snmp.send(pdu, target,null );
         synchronized (requests) 
         {
             requests.add(pdu.getRequestID());

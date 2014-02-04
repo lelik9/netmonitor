@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import DB.connect;
+import NetMonitor.main;
 import SNMP.GetNext;
 
 public class ArpTable
@@ -19,15 +20,17 @@ public class ArpTable
 		String Char = "";
 	        connect con = new connect();
 	        GetNext n = new GetNext();
+	        main m = new main();
+	        
 	        n.start();
 	        
-	        Connection connect = con.connectdb("monitor_db");//Connect to main base
-	        Statement stmt = connect.createStatement();
+	        Connection connect1 = m.getConnect1();
+	        Statement stmt1 = connect1.createStatement();
 	        
-	        Connection connection = con.connectdb("mib_db");//Connect to OID base
+	        Connection connect2 = m.getConnect2();
 	        
 	        //Reading OID from base
-	        preparedStatement = connection.prepareStatement("SELECT oid FROM public_oid WHERE object = ?");
+	        preparedStatement = connect2.prepareStatement("SELECT oid FROM public_oid WHERE object = ?");
 	        
 	        preparedStatement.setString(1, "atIfIndex");
 	        ResultSet res = preparedStatement.executeQuery();
@@ -46,42 +49,46 @@ public class ArpTable
 
 	        //Reading device IP from main base
 	        String sel = "SELECT IPaddress FROM devices WHERE DeviceName='"+device+"'";
-	        res = stmt.executeQuery(sel);
+	        res = stmt1.executeQuery(sel);
 	        res.next(); String IP = res.getString(1);
 	        
+		sel = "SELECT Community FROM Devices WHERE DeviceName = '"+device+"'";
+		res = stmt1.executeQuery(sel);
+		res.next(); String community = res.getString(1);
+		
+		sel = "SELECT Port FROM Devices WHERE DeviceName = '"+device+"'";
+		res = stmt1.executeQuery(sel);
+		res.next(); String port = res.getString(1);
 
-
-	        IP = "udp:"+IP+"/161";//Set address of device (CHANGE PORT)
+	        IP = "udp:"+IP+"/"+port;//Set address of device (CHANGE PORT)
 	        
 	        String TableClear = "DELETE FROM arptable WHERE DeviceName ='"+device+"'"; //Clear table
-		stmt.execute(TableClear);
+		stmt1.execute(TableClear);
 		
 	        while(Char!=null)
 	            {
-	        	n.GetNext(IP,atIfIndexOID,atIfIndex);  //Get interface Index
+	        	n.GetNext(IP,atIfIndexOID,atIfIndex, community);  //Get interface Index
 	        	Char=n.getChar();
 	        	String ind = Char;
 	        	atIfIndexOID = n.getNextOID();
 	        	if(Char==null) break;
 	        	
 		        sel = "SELECT intName FROM intinfo WHERE intIndex='"+ind+"' AND DeviceName = '"+device+"'"; //Get interface Name
-		        res = stmt.executeQuery(sel);
+		        res = stmt1.executeQuery(sel);
 		        res.next(); String intName = res.getString(1);		                	
 		        
-	        	n.GetNext(IP,atNetAddressOID,atNetAddress);  //Get interface Index
+	        	n.GetNext(IP,atNetAddressOID,atNetAddress, community);  //Get interface Index
 	        	String ip = n.getChar();
 	        	atNetAddressOID = n.getNextOID();
 
-	        	n.GetNext(IP, atPhysAddressOID, atPhysAddress);  //Get interface Index
+	        	n.GetNext(IP, atPhysAddressOID, atPhysAddress, community);  //Get interface Index
 	        	String mac = n.getChar();
-	        	System.out.println(mac);
 	        	atPhysAddressOID = atPhysAddress+"."+ip;	
 	        	
         		String AboutTable = "INSERT INTO arptable VALUES ('"+device+"','"+intName+"','"+ip+"','"+mac+"')";
-        		stmt.executeUpdate(AboutTable);
+        		stmt1.executeUpdate(AboutTable);
 
 	            }
-	        connect.close();
-	        connection.close();
+
 	    }
     }

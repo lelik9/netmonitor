@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import DB.connect;
+import NetMonitor.main;
 import SNMP.Get;
 import SNMP.GetNext;
 
@@ -17,24 +18,27 @@ public class InterfaceInfo
     
   public void GetIntInfo(String device) throws IOException, SQLException
     {
-        String Char="";
+        String Char = "";
 	String info;
-	String vlan="";
-	String index="";
+	String vlan = "";
+	String trunk = "";
+	String index = "";
 	
         connect con = new connect();
         GetNext n = new GetNext();
         Get t = new Get();
+        main m = new main();
+        
         n.start();
         t.start();
         
-        Connection connect = con.connectdb("monitor_db");//Connect to main base
-        Statement stmt = connect.createStatement();
+        Connection connect1 = m.getConnect1();
+        Statement stmt1 = connect1.createStatement();
         
-        Connection connection = con.connectdb("mib_db");//Connect to OID base
+        Connection connect2 = m.getConnect2();
 
         //Reading OID from base
-        preparedStatement = connection.prepareStatement("SELECT oid FROM public_oid WHERE object = ?");
+        preparedStatement = connect2.prepareStatement("SELECT oid FROM public_oid WHERE object = ?");
        
         preparedStatement.setString(1, "ifIndex");
         ResultSet res = preparedStatement.executeQuery();
@@ -66,7 +70,7 @@ public class InterfaceInfo
         res.next(); String ipAdEntIfIndex = res.getString(1);
 
         
-        preparedStatement = connection.prepareStatement("SELECT oid FROM Cisco_oid WHERE object = ?");
+        preparedStatement = connect2.prepareStatement("SELECT oid FROM Cisco_oid WHERE object = ?");
         
         preparedStatement.setString(1, "vmVlan");
         res = preparedStatement.executeQuery();      
@@ -81,26 +85,26 @@ public class InterfaceInfo
         
         //Reading group name
         String Group = "SELECT Vendor FROM devices WHERE DeviceName = '"+device+"'";
-        res = stmt.executeQuery(Group);
+        res = stmt1.executeQuery(Group);
         res.next(); String group = res.getString(1);
         
         //Reading device IP from main base
         String sel = "SELECT IPaddress FROM devices WHERE DeviceName='"+device+"'";
-        res = stmt.executeQuery(sel);
+        res = stmt1.executeQuery(sel);
         res.next(); String tmpIP = res.getString(1);
         
 	sel = "SELECT Community FROM Devices WHERE DeviceName = '"+device+"'";
-	res = stmt.executeQuery(sel);
+	res = stmt1.executeQuery(sel);
 	res.next(); String community = res.getString(1);
 	
 	sel = "SELECT Port FROM Devices WHERE DeviceName = '"+device+"'";
-	res = stmt.executeQuery(sel);
+	res = stmt1.executeQuery(sel);
 	res.next(); String port = res.getString(1);
         
         String IP = "udp:"+tmpIP+"/"+port;//Set address of device (CHANGE PORT)
       
         String TableClear = "DELETE FROM intinfo WHERE DeviceName = '"+device+"'"; //Clear table
-	stmt.execute(TableClear);
+	stmt1.execute(TableClear);
 
         while(Char!=null)
             {
@@ -142,7 +146,7 @@ public class InterfaceInfo
 
                 
                 info = "INSERT INTO intinfo VALUES ('"+device+"','"+index+"','"+intname+"','"+Status+"','-','"+vlan+"','"+mac+"')";
-                stmt.executeUpdate(info);
+                stmt1.executeUpdate(info);
             }
         
         if(group.equals("Cisco")==true) //Get interface Vlan
@@ -153,32 +157,36 @@ public class InterfaceInfo
         		vmVlanOID = n.getNextOID();
         		n.GetNext(IP,vmVlanOID,vmVlan, community); 
         		
-        		System.out.println(vmVlanOID);
+        	//	System.out.println(vmVlanOID);
         		vlan = n.getChar(); 
         		int a = vmVlan.length();
-        		System.out.println(a);
+        	//	System.out.println(a);
         		String tmp = vmVlanOID.substring(a+1);
         		
                         info = "UPDATE intinfo SET Vlan = '"+vlan+"' WHERE intIndex = '"+tmp+"'";
-                        stmt.executeUpdate(info);
-                        
+                        stmt1.executeUpdate(info);
+        	    }
+        	while(trunk!=null)
+        	    {
         		n.GetNext(IP, vlanTrunkPortDynamicStateOID, vlanTrunkPortDynamicState, community);
-        		String trunk = n.getChar();
+        		trunk = n.getChar();
+        		if(trunk ==null) break;
         		vlanTrunkPortDynamicStateOID = n.getNextOID();
             //   if(trunk ==null) break;
 
-/*		if(trunk.equals("1"))
+		if(trunk.equals("1"))
 		    {
-        		 a = vlanTrunkPortDynamicState.length();
-        		 tmp = vlanTrunkPortDynamicStateOID.substring(a+1);
-                         n.GetNext(IP,ifDescr+"."+tmp,ifDescr);
-                         System.out.println(ifDescr+"."+tmp);//Get interface Name
+        		int a = vlanTrunkPortDynamicState.length();
+        		String tmp = vlanTrunkPortDynamicStateOID.substring(a+1);
+        		
+                        n.GetNext(IP,ifDescr+"."+tmp,ifDescr, community);
                          Char=n.getChar();
+                         System.out.println(Char);
         		 vlan = "trunk";
-	                info = "UPDATE "+name+" SET Vlan = '"+vlan+"' WHERE interface = '"+Char+"'";
-	                stmt.executeUpdate(info);
+	                info = "UPDATE intinfo SET Vlan = '"+vlan+"' WHERE intName = '"+Char+"'";
+	                stmt1.executeUpdate(info);
 		    }
-*/
+
 
         	}
             }
@@ -197,10 +205,9 @@ public class InterfaceInfo
         	//System.out.println(Char);
 
                 info = "UPDATE intinfo SET IPaddress = '"+tmpIP+"' WHERE intIndex = '"+Char+"'";
-                stmt.executeUpdate(info);
+                stmt1.executeUpdate(info);
                 
             }
-        connect.close();
-        connection.close();
+
     }
 }	
