@@ -27,7 +27,7 @@ public class GetDeviceName
 		Connection connect = con.connectdb("monitor_db");
 		Statement stmt = connect.createStatement();
 		
-	        String Group = "SELECT DeviceName FROM devices WHERE group = '"+group+"'";
+	        String Group = "SELECT DeviceName FROM devices WHERE Groups = '"+group+"'";
 	        ResultSet res = stmt.executeQuery(Group);
 	        while(res.next())
 	            {

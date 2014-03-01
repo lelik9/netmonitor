@@ -7,10 +7,5 @@
 	<classpathentry kind="lib" path="D:/temp/NetMonitor/apache-mina-2.0.7/dist/mina-core-2.0.7.jar"/>
 	<classpathentry kind="lib" path="D:/temp/NetMonitor/apache-mina-2.0.7/lib/slf4j-api-1.6.6.jar"/>
 	<classpathentry kind="lib" path="D:/temp/NetMonitor/snakeyaml/target/snakeyaml-1.11.jar"/>
-	<classpathentry kind="lib" path="F:/programm/inst_work/!!!!Диплом!!!!/mina-core-2.0.7.jar"/>
-	<classpathentry kind="lib" path="F:/programm/inst_work/!!!!Диплом!!!!/snakeyaml-1.11.jar"/>
-	<classpathentry kind="lib" path="F:/programm/inst_work/!!!!Диплом!!!!/apache-mina-2.0.7/lib/slf4j-api-1.6.6.jar"/>
-	<classpathentry kind="lib" path="F:/programm/inst_work/!!!!Диплом!!!!/mysql-connector-java-5.1.28-bin.jar"/>
-	<classpathentry kind="lib" path="F:/programm/inst_work/!!!!Диплом!!!!/snmp4j-2.2.3.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
