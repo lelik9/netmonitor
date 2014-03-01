@@ -19,7 +19,7 @@ import NetMonitor.main;
 
 public class GetDeviceName
     {
-	public void GetDeviceName(String device) throws SQLException, IOException
+	public void GetDeviceName(String device, String group) throws SQLException, IOException
 	    {
 		List <String> devname = new ArrayList();
 		
@@ -27,7 +27,7 @@ public class GetDeviceName
 		Connection connect = con.connectdb("monitor_db");
 		Statement stmt = connect.createStatement();
 		
-	        String Group = "SELECT DeviceName FROM devices";
+	        String Group = "SELECT DeviceName FROM devices WHERE group = '"+group+"'";
 	        ResultSet res = stmt.executeQuery(Group);
 	        while(res.next())
 	            {

@@ -10,8 +10,11 @@ import org.apache.mina.core.session.IoSession;
 import org.yaml.snakeyaml.Yaml;
 
 import DB.connect;
+import DB.select.GetArp;
 import DB.select.GetDeviceName;
 import DB.select.GetIntInfo;
+import DB.select.GetMac;
+import DB.select.GetVlan;
 import Functions.ArpTable;
 import Functions.ExtIntInfo;
 import Functions.FindDevice;
@@ -46,9 +49,9 @@ public class ServerHandler implements IoHandler
 		ExtIntInfo ex =new ExtIntInfo();
 	        FindDevice f = new FindDevice();
 	        GetIntInfo i = new GetIntInfo();
-	        ArpTable a =new ArpTable();
-	        VlanTable v =new VlanTable();
-	        MacTable m = new MacTable();
+	        GetArp a =new GetArp();
+	        GetVlan v =new GetVlan();
+	        GetMac m = new GetMac();
 	        NetworkIPtable nn = new NetworkIPtable();
 	        GetDeviceName dn = new GetDeviceName();
 	        
@@ -71,15 +74,18 @@ public class ServerHandler implements IoHandler
 			break;
 			
 		    case "vlantable":
-			v.VlanTable(data.get("device"));
+			v.GetVlan(data.get("device"));
+			session.write(dump);
 			break;
 			
 		    case "mactable":
-			m.MacTable(data.get("device"));
+			m.GetMac(data.get("device"));
+			session.write(dump);
 			break;
 			
 		    case "arptable":
 			a.GetArp(data.get("device"));
+			session.write(dump);
 			break;
 			
 		    case "finddev":
@@ -89,7 +95,7 @@ public class ServerHandler implements IoHandler
 			break;
 			
 		    case "devices":
-			dn.GetDeviceName(data.get("device"));
+			dn.GetDeviceName(data.get("device"), data.get("group"));
 			System.out.println(dump);
 			session.write(dump);
 			break;

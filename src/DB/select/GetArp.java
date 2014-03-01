@@ -16,48 +16,58 @@ import org.yaml.snakeyaml.Yaml;
 import server.ServerHandler;
 import DB.connect;
 
-public class GetVlan
+public class GetArp
     {
-	public void GetVlan(String device) throws SQLException, IOException
+	public void GetArp(String device) throws SQLException, IOException
 	    {
-		List <String> vlanNum = new ArrayList();
-		List <String> vlanName = new ArrayList();
+		List <String> IPaddress = new ArrayList();
+		List <String> intName = new ArrayList();
+		List <String> Mac = new ArrayList();
 
 		
 		connect con = new connect();
 		Connection connect = con.connectdb("monitor_db");
 		Statement stmt = connect.createStatement();
 		
-		vlanNum.add("Vlan number");
-	        String Group = "SELECT vlanNum FROM vlantable WHERE DeviceName = '"+device+"'";
+		Mac.add("MAC address");
+	        String Group = "SELECT MAC FROM arptable WHERE DeviceName = '"+device+"'";
 	        ResultSet res = stmt.executeQuery(Group);
 	        while(res.next())
 	            {
-	        	vlanNum.add(res.getString(1));
+	        	Mac.add(res.getString(1));
 	            }
 	        
-	        vlanName.add("Vlan name");
-	        Group = "SELECT vlanName FROM vlantable WHERE DeviceName = '"+device+"'";
+	        intName.add("Interface");
+	        Group = "SELECT intName FROM arptable WHERE DeviceName = '"+device+"'";
 	        res = stmt.executeQuery(Group);
 	        while(res.next())
 	            {
-	        	vlanName.add(res.getString(1));
+	        	intName.add(res.getString(1));
+	            }
+	        
+	        IPaddress.add("IP address");
+	        Group = "SELECT IPaddress FROM arptable WHERE DeviceName = '"+device+"'";
+	        res = stmt.executeQuery(Group);
+	        while(res.next())
+	            {
+	        	IPaddress.add(res.getString(1));
 	            }
 	        
 
-	        Dump(vlanNum, vlanName);
+	        Dump(IPaddress, intName, Mac);
 
 	        connect.close();
 	    }
 	
-	public void Dump(List <String> vlanNum, List <String> vlanName)
+	public void Dump(List <String> IPaddress, List <String> intName, List <String> Mac)
 	    {
 		ServerHandler srv = new ServerHandler();
 		
 		Map<Integer, List <String>> data = new HashMap<Integer, List <String>>();
 		
-		data.put(0, vlanName);
-		data.put(1, vlanNum);
+		data.put(0, IPaddress);
+		data.put(1, intName);
+		data.put(2, Mac);
 
 		
 		DumperOptions options = new DumperOptions();
