@@ -105,7 +105,7 @@ public class main {
 	                acceptor.getFilterChain().addLast( "logger", new LoggingFilter() );
 	                acceptor.getFilterChain().addLast( "codec", new ProtocolCodecFilter( new TextLineCodecFactory( Charset.forName( "UTF-8" ))));
 	                acceptor.setHandler( new ServerHandler() );
-	            acceptor.getSessionConfig().setReadBufferSize( 2048 );
+	                acceptor.getSessionConfig().setReadBufferSize( 2048 );
 	                acceptor.getSessionConfig().setIdleTime( IdleStatus.BOTH_IDLE, 10 );
 	                acceptor.bind( new InetSocketAddress(PORT) );
 
