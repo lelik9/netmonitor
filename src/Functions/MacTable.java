@@ -73,7 +73,7 @@ public class MacTable
 		    {
 			String vlan = res.getString(1);
 			String Char ="";
-			System.out.println("vlan :"+vlan);
+		//	System.out.println("vlan :"+vlan);
 
 			dot1dTpFdbAddressOID = dot1dTpFdbAddress;
 			dot1dTpFdbPortOID = dot1dTpFdbPort;
@@ -85,14 +85,14 @@ public class MacTable
 				dot1dTpFdbAddressOID = n.getNextOID();
 				Char = n.getChar();
 				String mac = Char;
-				System.out.println("mac: "+mac);
+		//		System.out.println("mac: "+mac);
 				//System.out.println("nextOID: "+dot1dTpFdbAddressOID);
 				if(mac==null)break;
 				//dot1dTpFdbAddressOID = n.getNextOID();
 				
 				n.GetNext(IP,dot1dTpFdbPortOID,dot1dTpFdbPort,community+"@"+vlan);  //Get port index
 				String intport = n.getChar();
-				System.out.println(intport);
+		//		System.out.println(intport);
 				dot1dTpFdbPortOID = n.getNextOID();
 				/*
 

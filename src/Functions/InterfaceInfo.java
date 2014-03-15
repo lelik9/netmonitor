@@ -181,7 +181,7 @@ public class InterfaceInfo
         		
                         n.GetNext(IP,ifDescr+"."+tmp,ifDescr, community);
                          Char=n.getChar();
-                         System.out.println(Char);
+                      //   System.out.println(Char);
         		 vlan = "trunk";
 	                info = "UPDATE intinfo SET Vlan = '"+vlan+"' WHERE intName = '"+Char+"'";
 	                stmt1.executeUpdate(info);

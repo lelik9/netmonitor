@@ -6,12 +6,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import DB.connect;
 import Functions.ArpTable;
 import Functions.InterfaceInfo;
 import Functions.MacTable;
 import Functions.VlanTable;
-import NetMonitor.main;
 
 public class UpdateInfoThread extends Thread
     {
@@ -44,26 +42,29 @@ public class UpdateInfoThread extends Thread
 		        Statement stmt = connection.createStatement();
 		        
 		        String Select = "SELECT DeviceName FROM devices WHERE Groups = 'network'";
-		        ResultSet res = stmt.executeQuery(Select);
-
-		        while(res.next())
-		            {
-		        	Name = res.getString(1);
-			        System.out.println(Name);
+		        ResultSet res;
+		        
 		        	do
 		        	    {
-		            
-		        		i.GetIntInfo(Name);
-		        		vt.VlanTable(Name);
-		        		at.GetArp(Name);
-		        		mt.MacTable(Name);
+		        		res = stmt.executeQuery(Select);
 
+				        while(res.next())
+				            {
+				        	Name = res.getString(1);
+					        System.out.println(Name);
+		            
+					        i.GetIntInfo(Name);
+					        vt.VlanTable(Name);
+					        at.GetArp(Name);
+					        mt.MacTable(Name);
+					        
+				            }
 		        		try{
-		        		    Thread.sleep(30000);		//Приостановка потока на 1 сек.
+		        		    Thread.sleep(300000);		//Приостановка потока на 1 сек.
 		        		}catch(InterruptedException e){}
 		        	    }
 		        	while(true);
-		            }
+		            
 	     }
 	 
 	 public void Connect(Connection connect)
