@@ -15,6 +15,7 @@ public class UpdateInfoThread extends Thread
     {
 	private String Name;
 	private Connection connection;
+	private ResultSet res;
 	
 	 @Override
 	    public void run()
@@ -32,6 +33,7 @@ public class UpdateInfoThread extends Thread
 			e.printStackTrace();
 		    }
 	    }
+	 
 	 private void Check() throws SQLException, IOException
 	     {
 		        InterfaceInfo i = new InterfaceInfo();
@@ -42,7 +44,7 @@ public class UpdateInfoThread extends Thread
 		        Statement stmt = connection.createStatement();
 		        
 		        String Select = "SELECT DeviceName FROM devices WHERE Groups = 'network'";
-		        ResultSet res;
+
 		        
 		        	do
 		        	    {
