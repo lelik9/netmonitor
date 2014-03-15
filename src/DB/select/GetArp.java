@@ -15,18 +15,18 @@ import org.yaml.snakeyaml.Yaml;
 
 import server.ServerHandler;
 import DB.connect;
+import NetMonitor.main;
 
 public class GetArp
     {
-	public void GetArp(String device) throws SQLException, IOException
+	public void GetArp(String device, Connection connect) throws SQLException, IOException
 	    {
 		List <String> IPaddress = new ArrayList();
 		List <String> intName = new ArrayList();
 		List <String> Mac = new ArrayList();
 
 		
-		connect con = new connect();
-		Connection connect = con.connectdb("monitor_db");
+
 		Statement stmt = connect.createStatement();
 		
 		Mac.add("MAC address");

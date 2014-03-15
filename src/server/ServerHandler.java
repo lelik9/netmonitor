@@ -3,11 +3,14 @@ package server;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.sql.Connection;
 
 import org.apache.mina.core.service.IoHandler;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
 import org.yaml.snakeyaml.Yaml;
+
+
 
 import DB.connect;
 import DB.select.GetArp;
@@ -28,6 +31,14 @@ import SNMP.SetChar;
 public class ServerHandler implements IoHandler
     {
 	private static String dump;
+	private static Connection connection1;
+	private static Connection connection2;
+	
+	public void GetConnect(Connection connect1, Connection connect2)
+	    {
+		connection1 = connect1;
+		connection2 = connect2;
+	    }
 	
 	public static String getDump()
 	    {
@@ -38,6 +49,7 @@ public class ServerHandler implements IoHandler
 	    {
 		    ServerHandler.dump = dump;
 	    }
+	
 
 	public void exceptionCaught( IoSession session, Throwable cause ) throws Exception
 	    {
@@ -84,7 +96,7 @@ public class ServerHandler implements IoHandler
 			break;
 			
 		    case "arptable":
-			a.GetArp(data.get("device"));
+			a.GetArp(data.get("device"), connection1);
 			session.write(dump);
 			break;
 			
