@@ -25,6 +25,7 @@ import org.snmp4j.TransportMapping;
 import org.snmp4j.transport.DefaultUdpTransportMapping;
 
 import server.ServerHandler;
+import threads.UpdateInfoThread;
 import SNMP.Get;
 import SNMP.GetNext;
 import SNMP.Walk;
@@ -47,6 +48,8 @@ public class main {
     	private static Connection connect1;
     	private static Connection connect2;
     	private static final int PORT = 9123;
+    	
+    	static UpdateInfoThread update;
 
 	public static Connection getConnect1()
 	    {
@@ -83,8 +86,11 @@ public class main {
 	        NetworkIPtable nn = new NetworkIPtable();
 	        Walk w = new Walk();
 	        
+	        update = new UpdateInfoThread();
+	        
 	        Connection connect1 = con.connectdb("monitor_db");//Connect to main base
 	        setConnect1(connect1);
+	        update.Connect(connect1);
 	        
 	        Connection connect2 = con.connectdb("mib_db");//Connect to OID base
 	        setConnect2(connect2);
@@ -115,7 +121,8 @@ public class main {
 
 	              //  n.start();
 	                IP = "udp:"+ip1+"."+ip2+"."+ip3+"."+ip4+"/"+port;
-
+	                
+	                update.start();
 	               // String OID="1.3.6.1.2.1.4.22.1.3";
 	              //  String OID2="1.3.6.1.2.1.17.4.3.1.1";
 	               // nn.NetworkIP();
@@ -135,7 +142,7 @@ public class main {
 	        }
 	        
 	       // connect1.close();
-	        connect2.close();
+	      //  connect2.close();
 	    }
 
 }
