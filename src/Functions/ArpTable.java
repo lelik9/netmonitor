@@ -17,6 +17,12 @@ public class ArpTable
 	
 	public void GetArp(String device) throws IOException, SQLException
 	    {
+		
+		Arp(device);
+	    }
+	
+	private synchronized void Arp(String device) throws IOException, SQLException
+	    {
 		String Char = "";
 	        connect con = new connect();
 	        GetNext n = new GetNext();
@@ -89,6 +95,5 @@ public class ArpTable
         		stmt1.executeUpdate(AboutTable);
 
 	            }
-
 	    }
     }

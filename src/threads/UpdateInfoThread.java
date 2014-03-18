@@ -16,13 +16,18 @@ public class UpdateInfoThread extends Thread
 	private String Name;
 	private Connection connection;
 	private ResultSet res;
-	
+	//UpdateInfo UI;
 	 @Override
 	    public void run()
 	    {
+		UpdateInfo UI = new UpdateInfo();
 		try
 		    {
-			Check();
+			synchronized (UI)
+			    {
+				UI.Check();
+			    }
+			
 		    } catch (SQLException e)
 		    {
 			// TODO Auto-generated catch block
@@ -33,7 +38,9 @@ public class UpdateInfoThread extends Thread
 			e.printStackTrace();
 		    }
 	    }
-	 
+
+	 class UpdateInfo
+{
 	 private void Check() throws SQLException, IOException
 	     {
 		        InterfaceInfo i = new InterfaceInfo();
@@ -52,6 +59,7 @@ public class UpdateInfoThread extends Thread
 
 				        while(res.next())
 				            {
+				        	System.out.println("Update info start");
 				        	Name = res.getString(1);
 					        System.out.println(Name);
 		            
@@ -59,7 +67,7 @@ public class UpdateInfoThread extends Thread
 					        vt.VlanTable(Name);
 					        at.GetArp(Name);
 					        mt.MacTable(Name);
-					        
+					        System.out.println("Update info end");
 				            }
 		        		try{
 		        		    Thread.sleep(300000);		//Приостановка потока на 1 сек.
@@ -69,6 +77,7 @@ public class UpdateInfoThread extends Thread
 		            
 	     }
 	 
+	 }
 	 public void Connect(Connection connect)
 	     {
 		 connection = connect;

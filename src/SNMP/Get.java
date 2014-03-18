@@ -28,7 +28,7 @@ public class Get implements ResponseListener {
     
     private final static String SNMP_COMMUNITY = "public";
     private final static int    SNMP_RETRIES   = 1;
-    private final static long   SNMP_TIMEOUT   = 200;
+    private final static long   SNMP_TIMEOUT   = 1000;
     
     private Snmp snmp = null;
     private TransportMapping transport = null;
@@ -56,7 +56,7 @@ public class Get implements ResponseListener {
     	
         Integer32 requestId = event.getRequest().getRequestID();
         PDU response = event.getResponse();
-        
+        System.out.println(response.get(0).toValueString());
         if (response != null) 
         {
     		setGetChar(response.get(0).toValueString());
@@ -81,7 +81,7 @@ public class Get implements ResponseListener {
         Target t = getTarget(IP);
 
             send(t, OID);
-        
+
         while (!requests.isEmpty()) 
             {
             try {
@@ -91,7 +91,7 @@ public class Get implements ResponseListener {
         	{
         	    e.printStackTrace();
         	}
-            } 
+            }
 
     }
     
