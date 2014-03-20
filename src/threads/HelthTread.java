@@ -43,7 +43,7 @@ public class HelthTread extends Thread
 	        while(true); 
 	    }
 	 
-	 public void Connect(Connection connect1, Connection connect2)
+	 public synchronized void Connect(Connection connect1, Connection connect2)
 	     {
 		 connection1 = connect1;
 		 connection2 = connect2;

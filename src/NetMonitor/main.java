@@ -69,7 +69,7 @@ public class main {
 	        setConnect2(connect2);
 	        
 	        health.Connect(connect1, connect2);
-	        update.Connect(connect1);
+	        update.Connect(connect1, connect2);
 	        	        
 	    	int ip1 = 192;
 	    	int ip2 = 168;

@@ -18,6 +18,8 @@ import SNMP.GetNext;
 public class FindDevice 
 {
     private PreparedStatement preparedStatement = null;
+    private Connection connection1;
+    private Connection connection2;
 	
 	public void FindDevice(int ip1, int ip2,int ip3,int ip4,int mask,int port, String community)
 		    throws IOException, SQLException
@@ -25,7 +27,7 @@ public class FindDevice
 		        Get t = new Get();
 		        GetNext n = new GetNext();
 		        InterfaceInfo i = new InterfaceInfo();
-		        connect con =new connect();
+
 		        main m = new main();
 		        MacTable mt = new MacTable();
 		        VlanTable vt = new VlanTable();
@@ -34,11 +36,9 @@ public class FindDevice
 		        t.start();
 		        n.start();
 		        		        
-		        Connection connect1 = m.getConnect1();
-		        Statement stmt1 = connect1.createStatement();
-		        
-		        Connection connect2 = m.getConnect2();
-		        
+
+		        Statement stmt1 = connection1.createStatement();
+		        	        
 					
 		        int wildcard=255-mask;
 		        int tmpIP4=wildcard;
@@ -47,7 +47,7 @@ public class FindDevice
 		        String IP;
 		        
 		        //Reading OID from base
-		        preparedStatement = connect2.prepareStatement("SELECT oid FROM public_oid WHERE object = ?");
+		        preparedStatement = connection2.prepareStatement("SELECT oid FROM public_oid WHERE object = ?");
 
 		        preparedStatement.setString(1,"sysName");
 		        ResultSet res = preparedStatement.executeQuery();
@@ -135,10 +135,10 @@ public class FindDevice
 		        		stmt1.executeUpdate(info);
 		        	    }		        	
 				
-				i.GetIntInfo(Name1);
-				vt.VlanTable(Name1);
-				at.GetArp(Name1);
-				mt.MacTable(Name1);
+				i.GetIntInfo(Name1, connection1, connection2);
+				vt.VlanTable(Name1, connection1, connection2);
+				at.GetArp(Name1, connection1, connection2);
+				mt.MacTable(Name1, connection1, connection2);
 				
 		            }
 		            
@@ -150,5 +150,11 @@ public class FindDevice
 
 		    	
 		    }
+	
+	 public synchronized void Connect(Connection connect1, Connection connect2)
+	     {
+		 connection1 = connect1;
+		 connection2 = connect2;
+	     }
 
 }

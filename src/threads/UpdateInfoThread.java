@@ -14,7 +14,8 @@ import Functions.VlanTable;
 public class UpdateInfoThread extends Thread
     {
 	private String Name;
-	private Connection connection;
+	private Connection connection1;
+	private Connection connection2;
 	private ResultSet res;
 	//UpdateInfo UI;
 	 @Override
@@ -48,7 +49,7 @@ public class UpdateInfoThread extends Thread
 		        VlanTable vt = new VlanTable();
 		        ArpTable at = new ArpTable();
 		        
-		        Statement stmt = connection.createStatement();
+		        Statement stmt = connection1.createStatement();
 		        
 		        String Select = "SELECT DeviceName FROM devices WHERE Groups = 'network'";
 
@@ -63,10 +64,10 @@ public class UpdateInfoThread extends Thread
 				        	Name = res.getString(1);
 					        System.out.println(Name);
 		            
-					        i.GetIntInfo(Name);
-					        vt.VlanTable(Name);
-					        at.GetArp(Name);
-					        mt.MacTable(Name);
+					 //       i.GetIntInfo(Name);
+					        vt.VlanTable(Name, connection1, connection2);
+					 //       at.GetArp(Name, connection1, connection2);
+					        mt.MacTable(Name, connection1, connection2);
 					        System.out.println("Update info end");
 				            }
 		        		try{
@@ -78,8 +79,9 @@ public class UpdateInfoThread extends Thread
 	     }
 	 
 	 }
-	 public void Connect(Connection connect)
+	 public synchronized void Connect(Connection connect1, Connection connect2)
 	     {
-		 connection = connect;
+		 connection1 = connect1;
+		 connection2 = connect2;
 	     }
     }

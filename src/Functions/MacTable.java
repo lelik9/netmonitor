@@ -15,20 +15,18 @@ import SNMP.GetNext;
 public class MacTable
     {
 		
-	public void MacTable(String device) throws IOException, SQLException
+	public void MacTable(String device, Connection connect1, Connection connect2) throws IOException, SQLException
 	    {
-	        connect con = new connect();
+
 	        GetNext n = new GetNext();
 	        main m = new main();
 	        
 	        n.start();
 
 	        
-	        Connection connect1 = m.getConnect1();
 	        Statement stmt1 = connect1.createStatement();
 	        Statement stmt3 = connect1.createStatement();
 	        
-	        Connection connect2 = m.getConnect2();
 	        Statement stmt2 = connect2.createStatement();
 	        
 	        //Reading OID from base      

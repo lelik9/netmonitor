@@ -27,7 +27,7 @@ import org.snmp4j.transport.DefaultUdpTransportMapping;
 public class Get implements ResponseListener {
     
     private final static String SNMP_COMMUNITY = "public";
-    private final static int    SNMP_RETRIES   = 1;
+    private final static int    SNMP_RETRIES   = 3;
     private final static long   SNMP_TIMEOUT   = 1000;
     
     private Snmp snmp = null;
@@ -56,17 +56,17 @@ public class Get implements ResponseListener {
     	
         Integer32 requestId = event.getRequest().getRequestID();
         PDU response = event.getResponse();
-        System.out.println(response.get(0).toValueString());
+      //  System.out.println(response.get(0).toValueString());
         if (response != null) 
         {
     		setGetChar(response.get(0).toValueString());
 
-        }  else
+        } /* else
         {
         	
         	GetChar=null;
         	
-        }
+        }*/
 
         synchronized (requests) 
         {

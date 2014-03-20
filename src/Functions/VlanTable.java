@@ -7,27 +7,21 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import DB.connect;
-import NetMonitor.main;
+
 import SNMP.GetNext;
 
 public class VlanTable
     {
 	private PreparedStatement preparedStatement = null;
 	
-	public void VlanTable(String device) throws IOException, SQLException
+	public void VlanTable(String device, Connection connect1, Connection connect2) throws IOException, SQLException
 	    {
 		String Char = "";
-	        connect con = new connect();
 	        GetNext n = new GetNext();
-	        main m = new main();
-	       
 	        n.start();
 
-	        Connection connect1 = m.getConnect1();
+
 	        Statement stmt1 = connect1.createStatement();
-	        
-	        Connection connect2 = m.getConnect2();
 	        Statement stmt2 = connect2.createStatement();
 	        
 	        //Reading OID from base

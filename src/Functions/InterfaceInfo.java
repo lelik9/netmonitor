@@ -7,8 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import DB.connect;
-import NetMonitor.main;
+
 import SNMP.Get;
 import SNMP.GetNext;
 
@@ -16,7 +15,7 @@ public class InterfaceInfo
 {
 	private PreparedStatement preparedStatement = null;
     
-  public void GetIntInfo(String device) throws IOException, SQLException
+  public void GetIntInfo(String device, Connection connect1, Connection connect2) throws IOException, SQLException
     {
         String Char = "";
 	String info;
@@ -24,18 +23,16 @@ public class InterfaceInfo
 	String trunk = "";
 	String index = "";
 	
-        connect con = new connect();
+
         GetNext n = new GetNext();
         Get t = new Get();
-        main m = new main();
+
         
         n.start();
         t.start();
         
-        Connection connect1 = m.getConnect1();
         Statement stmt1 = connect1.createStatement();
-        
-        Connection connect2 = m.getConnect2();
+
 
         //Reading OID from base
         preparedStatement = connect2.prepareStatement("SELECT oid FROM public_oid WHERE object = ?");

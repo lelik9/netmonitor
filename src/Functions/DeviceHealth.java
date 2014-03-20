@@ -95,7 +95,7 @@ public class DeviceHealth
 	        while(res.next())
 	            {
 	        	device = res.getString(1);
-		        System.out.println(device);
+		    //    System.out.println(device);
 		        
 		        //Reading device IP from main base
 		        String sel = "SELECT IPaddress FROM devices WHERE DeviceName='"+device+"'";
@@ -132,6 +132,7 @@ public class DeviceHealth
 	        	String data = "1";
 	        	while(data!=null)
 	        	    {
+	        		System.out.println(ciscoEnvMonFanStatusDescrOID);
 		        	n.GetNext(IP,ciscoEnvMonFanStatusDescrOID,ciscoEnvMonFanStatusDescr, community);  //Get FAN description
 		        	data = n.getChar();
 		        	ciscoEnvMonFanStatusDescrOID = n.getNextOID();
@@ -148,7 +149,7 @@ public class DeviceHealth
 		        	 if(statusFan.equals("4")){ statusFan = "shutdown";}
 		        	 if(statusFan.equals("5")){ statusFan = "notPresent";}
 		        	 if(statusFan.equals("6")){ statusFan = "notFunctioning";}
-		        	 System.out.println(statusFan);
+		        //	 System.out.println(statusFan);
 		        	 
 			       if(!statusFan.equals("normal") && statusFan !=null)
 				   {
@@ -163,7 +164,7 @@ public class DeviceHealth
 			        String descrPower = data;
 		        	int a1 = ciscoEnvMonSupplyStatusDescr.length();
 		                String tmp1 = ciscoEnvMonSupplyStatusDescrOID.substring(a1+1);
-		                System.out.println(descrPower);
+		       //         System.out.println(descrPower);
 		                
 			        g.get(IP,ciscoEnvMonSupplyState+"."+tmp1); //Get PowerSupply status 1:normal 2:warning 3:critical 4:shutdown 5:notPresent 6:notFunctioning
 			        String statusPower = g.getGetChar();
@@ -173,7 +174,7 @@ public class DeviceHealth
 			         if(statusPower.equals("4")){ statusPower = "shutdown";}
 			         if(statusPower.equals("5")){ statusPower = "notPresent";}
 			         if(statusPower.equals("6")){ statusPower = "notFunctioning";}   
-			         System.out.println(statusPower);
+			//         System.out.println(statusPower);
 			         
 			        if(!statusPower.equals("normal"))
 			            {

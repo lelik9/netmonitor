@@ -15,13 +15,13 @@ public class ArpTable
     {
 	private PreparedStatement preparedStatement = null;
 	
-	public void GetArp(String device) throws IOException, SQLException
+	public void GetArp(String device, Connection connect1, Connection connect2) throws IOException, SQLException
 	    {
 		
-		Arp(device);
+		Arp(device, connect1, connect2);
 	    }
 	
-	private synchronized void Arp(String device) throws IOException, SQLException
+	private synchronized void Arp(String device, Connection connect1, Connection connect2) throws IOException, SQLException
 	    {
 		String Char = "";
 	        connect con = new connect();
@@ -30,10 +30,9 @@ public class ArpTable
 	        
 	        n.start();
 	        
-	        Connection connect1 = m.getConnect1();
+
 	        Statement stmt1 = connect1.createStatement();
-	        
-	        Connection connect2 = m.getConnect2();
+
 	        
 	        //Reading OID from base
 	        preparedStatement = connect2.prepareStatement("SELECT oid FROM public_oid WHERE object = ?");
@@ -82,7 +81,7 @@ public class ArpTable
 		        sel = "SELECT intName FROM intinfo WHERE intIndex='"+ind+"' AND DeviceName = '"+device+"'"; //Get interface Name
 		        res = stmt1.executeQuery(sel);
 		        res.next(); String intName = res.getString(1);		                	
-		        
+		        System.out.println(intName);
 	        	n.GetNext(IP,atNetAddressOID,atNetAddress, community);  //Get interface Index
 	        	String ip = n.getChar();
 	        	atNetAddressOID = n.getNextOID();
