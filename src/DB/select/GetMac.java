@@ -14,7 +14,7 @@ import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
 import server.ServerHandler;
-import DB.connect;
+import DB.Connect;
 
 public class GetMac
     {
@@ -25,7 +25,7 @@ public class GetMac
 		List <String> vlan = new ArrayList();
 
 		
-		connect con = new connect();
+		Connect con = new Connect();
 		Connection connect = con.connectdb("monitor_db");
 		Statement stmt = connect.createStatement();
 		

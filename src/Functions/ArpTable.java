@@ -7,7 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import DB.connect;
+import DB.Connect;
 import NetMonitor.main;
 import SNMP.GetNext;
 
@@ -24,7 +24,7 @@ public class ArpTable
 	private synchronized void Arp(String device, Connection connect1, Connection connect2) throws IOException, SQLException
 	    {
 		String Char = "";
-	        connect con = new connect();
+	        Connect con = new Connect();
 	        GetNext n = new GetNext();
 	        main m = new main();
 	        

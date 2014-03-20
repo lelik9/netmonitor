@@ -5,7 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import DB.connect;
+import DB.Connect;
 import NetMonitor.main;
 import SNMP.GetNext;
 
@@ -15,7 +15,7 @@ public class NetworkIPtable
 	    {
 		 String mac="-";
 		 
-		 connect con = new connect();
+		 Connect con = new Connect();
 		 main m = new main();
 		        		        
 		 Connection connect1 = m.getConnect1();

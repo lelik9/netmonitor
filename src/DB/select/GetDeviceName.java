@@ -14,7 +14,6 @@ import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
 import server.ServerHandler;
-import DB.connect;
 import NetMonitor.main;
 
 public class GetDeviceName
@@ -23,7 +22,7 @@ public class GetDeviceName
 	    {
 		List <String> devname = new ArrayList();
 		
-		connect con = new connect();
+		Connect con = new Connect();
 		Connection connect = con.connectdb("monitor_db");
 		Statement stmt = connect.createStatement();
 		

@@ -14,7 +14,7 @@ import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
 import server.ServerHandler;
-import DB.connect;
+import DB.Connect;
 import NetMonitor.main;
 
 public class GetArp

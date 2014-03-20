@@ -12,7 +12,7 @@ import org.yaml.snakeyaml.Yaml;
 
 
 
-import DB.connect;
+import DB.Connect;
 import DB.select.GetArp;
 import DB.select.GetDeviceName;
 import DB.select.GetIntInfo;

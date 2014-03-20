@@ -7,7 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import DB.connect;
+import DB.Connect;
 import SNMP.GetNext;
 
 public class IntUtilization
@@ -16,7 +16,7 @@ public class IntUtilization
 	
 	public void IntUtil(String device) throws SQLException, IOException
 	    {
-	        connect con = new connect();
+	        Connect con = new Connect();
 	        GetNext n = new GetNext();
 	        n.start();
 	        

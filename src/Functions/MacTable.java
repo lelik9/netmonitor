@@ -7,7 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import DB.connect;
+import DB.Connect;
 import NetMonitor.main;
 import SNMP.Get;
 import SNMP.GetNext;

@@ -9,7 +9,7 @@ import java.sql.Statement;
 
 import org.snmp4j.smi.OctetString;
 
-import DB.connect;
+import DB.Connect;
 import NetMonitor.main;
 import SNMP.Get;
 import SNMP.GetNext;

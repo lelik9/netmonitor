@@ -16,7 +16,7 @@ import org.yaml.snakeyaml.DumperOptions.ScalarStyle;
 import org.yaml.snakeyaml.Yaml;
 
 import server.ServerHandler;
-import DB.connect;
+import DB.Connect;
 import SNMP.*;
 
 public class ExtIntInfo
@@ -93,7 +93,7 @@ public class ExtIntInfo
 		OutErrors.add("OutErrors");
 		
 		GetNext n = new GetNext();
-	        connect con = new connect();
+	        Connect con = new Connect();
 	        
 	        n.start();
 	        

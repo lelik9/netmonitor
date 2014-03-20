@@ -14,7 +14,7 @@ import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
 import server.ServerHandler;
-import DB.connect;
+import DB.Connect;
 
 public class GetIntInfo
     {
@@ -27,7 +27,7 @@ public class GetIntInfo
 		List <String> Vlan = new ArrayList();
 		List <String> MAC = new ArrayList();
 		
-		connect con = new connect();
+		Connect con = new Connect();
 		Connection connect = con.connectdb("monitor_db");
 		Statement stmt = connect.createStatement();
 		

@@ -12,17 +12,20 @@ import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
 import java.sql.Connection;
 import java.sql.SQLException;
+
 import org.apache.mina.core.service.IoAcceptor;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
 import org.apache.mina.filter.logging.LoggingFilter;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
+
 import server.ServerHandler;
 import threads.HelthTread;
 import threads.UpdateInfoThread;
 import SNMP.Get;
-import DB.connect;
+import DB.Connect;
+import DB.DbConnectionPool;
 
 
 
@@ -58,11 +61,13 @@ public class main {
 	public static void main(String[] args) throws SQLException, IOException 
 	{
 	        Get t = new Get();
-	        connect con = new connect();
+	        Connect con = new Connect();
 	        update = new UpdateInfoThread();
 	        health = new HelthTread();
 	        
-	        Connection connect1 = con.connectdb("monitor_db");//Connect to main base
+	        DbConnectionPool dbConnectionPool = DbConnectionPool.getInstance();
+	        
+	        Connection connect1 = dbConnectionPool.getConnection();//Connect to main base
 	        setConnect1(connect1);
 	        
 	        Connection connect2 = con.connectdb("mib_db");//Connect to OID base
