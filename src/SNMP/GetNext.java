@@ -16,16 +16,20 @@ import org.snmp4j.smi.GenericAddress;
 import org.snmp4j.smi.Integer32;
 import org.snmp4j.smi.OID;
 import org.snmp4j.smi.OctetString;
+import org.snmp4j.smi.UdpAddress;
 import org.snmp4j.smi.VariableBinding;
+import org.snmp4j.transport.AbstractTransportMapping;
 import org.snmp4j.transport.DefaultUdpTransportMapping;
+
+import DB.DbConnectionPool;
 
 public class GetNext implements ResponseListener {
     
 
 
     private final static String SNMP_COMMUNITY = "public";
-    private final static int    SNMP_RETRIES   = 3;
-    private final static long   SNMP_TIMEOUT   = 1000;
+    private final static int    SNMP_RETRIES   = 1;
+    private final static long   SNMP_TIMEOUT   = 100;
 
     
     private Snmp snmp = null;
@@ -35,6 +39,7 @@ public class GetNext implements ResponseListener {
     private String Char;
     private static String CheckOID;
     private static String Com;
+    private static volatile GetNext instance;
     
     private Set<Integer32> requests = new HashSet<Integer32>();
 
@@ -77,25 +82,46 @@ public class GetNext implements ResponseListener {
 	{
 		NextOID = nextOID;
 	}
+    
+    private GetNext()
+	{
+	    
+	}
 
+    public static GetNext getInstance(){
+            if(instance == null){
+        	synchronized(DbConnectionPool.class){
+        	    if(instance == null){
+        		instance = new GetNext();
+        	    }
+        	}
+            }
+            return instance;
+	}
 
-    public void onResponse(ResponseEvent event) 
+    public synchronized void onResponse(ResponseEvent event) 
 	{
         Integer32 requestId = event.getRequest().getRequestID();
         PDU response = event.getResponse();
-     //   System.out.println(response.get(0).toString());
+     //   System.out.println("requestID2: "+response.getRequestID());
+    //    System.out.println(response.get(0).toString());
+        if (response ==null) return;
         if(response.get(0).getOid().startsWith(new OID(getCheckOID()))!=false)
         	    {
         		setChar(response.get(0).toValueString());
-        		
+        		        		
         		setNextOID(response.get(0).getOid().toString());
+        		
+        		
+        		//System.out.println("nextOID: "+ NextOID);
 
         	    }  else 
         		{
         		    setChar(null);
+        		    setNextOID(null);
         		} 	       
             
-        
+            
 
         synchronized (requests) 
         {
@@ -104,26 +130,39 @@ public class GetNext implements ResponseListener {
             
     }
     
-    public void GetNext(String IP, String OID1, String CheckOID, String community) throws IOException
+    
+    public synchronized ResponseResult GetNext(final String IP, final String OID1, final String CheckOID, final String community) throws IOException
     {
         setCheckOID(CheckOID);
         setCom(community);
         Target t = getTarget(IP);
-        send(t, OID1);
+        return send(t, OID1);
+
     }
     
-    private void send(Target target, String oid1) throws IOException {
+    private synchronized ResponseResult send(Target target, String oid1) throws IOException {
             PDU pdu = new PDU();
             
             pdu.add(new VariableBinding(new OID(oid1)));    
             pdu.setType(PDU.GETNEXT);
 
-            ResponseEvent event = snmp.send(pdu, target,null );
+         //   ResponseEvent event = snmp.send(pdu, target,null);
+            ResponseEvent event = snmp.getNext(pdu, target);
+                        
         synchronized (requests) 
         {
             requests.add(pdu.getRequestID());
         }
-        onResponse(event);
+        if(event !=null)
+            {
+        	onResponse(event);
+        	ResponseResult resp = new ResponseResult();
+        	
+        	resp.setChar(Char);
+        	resp.setNextOID(NextOID);
+        	return resp;
+            }
+        return null;
     }
     
     private Target getTarget(String address) {
@@ -140,7 +179,8 @@ public class GetNext implements ResponseListener {
     public void start() throws IOException {
         transport = new DefaultUdpTransportMapping();
         snmp = new Snmp(transport);
-        transport.listen();
+        snmp.listen();
+      //  transport.listen();
     }
     
     public void stop() throws IOException {

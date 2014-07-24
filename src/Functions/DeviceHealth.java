@@ -12,6 +12,7 @@ import java.util.Date;
 
 import SNMP.Get;
 import SNMP.GetNext;
+import SNMP.ResponseResult;
 
 
 public class DeviceHealth
@@ -22,6 +23,7 @@ public class DeviceHealth
 	private ResultSet res2;
 	private String device;
 	private PreparedStatement preparedStatement = null;
+	private ResponseResult result;
 	
 	public void DeviceHealth() throws SQLException, IOException
 	    {
@@ -30,8 +32,8 @@ public class DeviceHealth
 	
 	private synchronized void Health() throws SQLException, IOException
 	    {
-	        GetNext n = new GetNext();
-	        n.start();
+		GetNext n = GetNext.getInstance();
+
 	        Get g = new Get();
 	        g.start();
 	        
@@ -112,8 +114,8 @@ public class DeviceHealth
 
 		        IP = "udp:"+IP+"/"+port; //Set address of device (CHANGE PORT)
 		        		        
-		        n.GetNext(IP,sysUpTimeInstance,sysUpTimeInstance, community); //Get UP time of device
-	        	String upTime = n.getChar();
+		        result = n.GetNext(IP,sysUpTimeInstance,sysUpTimeInstance, community); //Get UP time of device
+	        	String upTime = result.getChar();
 	        	
 	        	
 	        	g.get(IP,ciscoMemoryPoolUsed); //Get using memory
@@ -125,41 +127,44 @@ public class DeviceHealth
 	        	
 	        	int memUsingPercent = memUsage/((memUsage+memFree)/100); //Used memory in percent
 	        	
-	        	n.GetNext(IP,chassisTempAlarm,chassisTempAlarm, community);  //Get max temperature
-	        	String maxTemp = n.getChar();
+	        	result = n.GetNext(IP,chassisTempAlarm,chassisTempAlarm, community);  //Get max temperature
+	        	String maxTemp = result.getChar();
 	        	//System.out.println(maxTemp);
 	        	
-	        	String data = "1";
-	        	while(data!=null)
+	        	String data;
+	        	do
 	        	    {
-	        		System.out.println(ciscoEnvMonFanStatusDescrOID);
-		        	n.GetNext(IP,ciscoEnvMonFanStatusDescrOID,ciscoEnvMonFanStatusDescr, community);  //Get FAN description
-		        	data = n.getChar();
-		        	ciscoEnvMonFanStatusDescrOID = n.getNextOID();
+	        		System.out.println("csico"+ciscoEnvMonFanStatusDescrOID);
+	        		result = n.GetNext(IP,ciscoEnvMonFanStatusDescrOID,ciscoEnvMonFanStatusDescr, community);  //Get FAN description
+		        	data = result.getChar();
+		        	ciscoEnvMonFanStatusDescrOID = result.getNextOID();
 		        	if(data == null) break;
 		        	String descrFan = data;
 
 	                	
-	                	n.GetNext(IP,ciscoEnvMonFanStateOID,ciscoEnvMonFanState, community);
-	                	String statusFan = n.getChar();
-	                	ciscoEnvMonFanStateOID = n.getNextOID();
+		        	result = n.GetNext(IP,ciscoEnvMonFanStateOID,ciscoEnvMonFanState, community);
+	                	String statusFan = result.getChar();
+	                	System.out.println(statusFan);
+	                	ciscoEnvMonFanStateOID = result.getNextOID();
 		        	 if(statusFan.equals("1")){ statusFan = "normal";}
 		        	 if(statusFan.equals("2")){ statusFan = "warning";}
 		        	 if(statusFan.equals("3")){ statusFan = "critical";}
 		        	 if(statusFan.equals("4")){ statusFan = "shutdown";}
 		        	 if(statusFan.equals("5")){ statusFan = "notPresent";}
 		        	 if(statusFan.equals("6")){ statusFan = "notFunctioning";}
-		        //	 System.out.println(statusFan);
+		        	 System.out.println(statusFan);
 		        	 
 			       if(!statusFan.equals("normal") && statusFan !=null)
 				   {
 			        	info = "INSERT INTO logs VALUES ('"+dateFormat.format(date)+"','"+device+"','FAN status: "+statusFan+"')";
 			        	stmt.executeUpdate(info);
 			            }
-		        	 
-			        n.GetNext(IP,ciscoEnvMonSupplyStatusDescrOID,ciscoEnvMonSupplyStatusDescr, community);  //Get PowerSupply description
-			        data = n.getChar();
-			        ciscoEnvMonSupplyStatusDescrOID = n.getNextOID();
+	        	    }while(data!=null);
+	        	do
+	        	    {
+	        		result = n.GetNext(IP,ciscoEnvMonSupplyStatusDescrOID,ciscoEnvMonSupplyStatusDescr, community);  //Get PowerSupply description
+			        data = result.getChar();
+			        ciscoEnvMonSupplyStatusDescrOID = result.getNextOID();
 			        if(data == null) break;
 			        String descrPower = data;
 		        	int a1 = ciscoEnvMonSupplyStatusDescr.length();
@@ -183,7 +188,7 @@ public class DeviceHealth
 				     }
 		        	
 	        		
-	        	    }
+	        	    }while(data!=null);
 	        	
 	        	if(memUsingPercent > 65)
 	        	    {
@@ -192,6 +197,8 @@ public class DeviceHealth
 	        	    }
 	        	
 	            }
+
+	        g.stop();
 
 	    }
 	

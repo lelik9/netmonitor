@@ -6,10 +6,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import Functions.ArpTable;
-import Functions.InterfaceInfo;
+
 import Functions.MacTable;
-import Functions.VlanTable;
+
 
 public class UpdateInfoThread extends Thread
     {
@@ -44,10 +43,9 @@ public class UpdateInfoThread extends Thread
 {
 	 private void Check() throws SQLException, IOException
 	     {
-		        InterfaceInfo i = new InterfaceInfo();
+
 		        MacTable mt = new MacTable();
-		        VlanTable vt = new VlanTable();
-		        ArpTable at = new ArpTable();
+
 		        
 		        Statement stmt = connection1.createStatement();
 		        
@@ -57,17 +55,16 @@ public class UpdateInfoThread extends Thread
 		        	do
 		        	    {
 		        		res = stmt.executeQuery(Select);
-
+		        		
 				        while(res.next())
 				            {
 				        	System.out.println("Update info start");
 				        	Name = res.getString(1);
 					        System.out.println(Name);
 		            
-					 //       i.GetIntInfo(Name);
-					        vt.VlanTable(Name, connection1, connection2);
-					 //       at.GetArp(Name, connection1, connection2);
 					        mt.MacTable(Name, connection1, connection2);
+					        System.out.println("End get mac");
+					 //       at.GetArp(Name, connection1, connection2);
 					        System.out.println("Update info end");
 				            }
 		        		try{

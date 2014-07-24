@@ -12,10 +12,12 @@ public class DbConnectionPool
 	private int currentConnection = 0;
 	
 	private static volatile DbConnectionPool instance;
-	private List<Connection> connections; 
+	private List<Connection> connections1;
+	private List<Connection> connections2;
 		
 	private DbConnectionPool (){
-	    connections = new ArrayList<Connection>(MAX_NUMBER_OF_CONNECTIONS);
+	    connections1 = new ArrayList<Connection>(MAX_NUMBER_OF_CONNECTIONS);
+	    connections2 = new ArrayList<Connection>(MAX_NUMBER_OF_CONNECTIONS);
 	    createConnections();
 	}
 	
@@ -35,7 +37,8 @@ public class DbConnectionPool
 	    while (i < MAX_NUMBER_OF_CONNECTIONS){
 		try
 		    {
-			connections.add(Connect.connectdb());
+			connections1.add(Connect.connectdb("monitor_db"));
+			connections2.add(Connect.connectdb("mib_db"));
 		    } catch (SQLException e)
 		    {
 			System.out.println("Connection to database failed!");
@@ -50,7 +53,8 @@ public class DbConnectionPool
 	    while (i < MAX_NUMBER_OF_CONNECTIONS){
 			try
 			    {
-				Connect.closeConnection(connections.get(i));
+				Connect.closeConnection(connections1.get(i));
+				Connect.closeConnection(connections2.get(i));
 			    } catch (SQLException e)
 			    {
 				System.out.println("Connection doesn't close!");
@@ -60,9 +64,16 @@ public class DbConnectionPool
 		}
 	}
 	
-	public Connection getConnection(){
+	public Connection getConnection1(){
 	    if (currentConnection < MAX_NUMBER_OF_CONNECTIONS){
-		return connections.get(currentConnection++);
+		return connections1.get(currentConnection++);
+	    }
+	    return null;
+	}
+	
+	public Connection getConnection2(){
+	    if (currentConnection < MAX_NUMBER_OF_CONNECTIONS){
+		return connections2.get(currentConnection++);
 	    }
 	    return null;
 	}

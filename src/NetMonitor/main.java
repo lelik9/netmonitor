@@ -24,8 +24,12 @@ import server.ServerHandler;
 import threads.HelthTread;
 import threads.UpdateInfoThread;
 import SNMP.Get;
+import SNMP.GetNext;
+import SNMP.Walk;
 import DB.Connect;
 import DB.DbConnectionPool;
+import Functions.FindDevice;
+import Functions.Universal;
 
 
 
@@ -65,24 +69,27 @@ public class main {
 	        update = new UpdateInfoThread();
 	        health = new HelthTread();
 	        
+	        GetNext next = GetNext.getInstance();
+	        next.start();
 	        DbConnectionPool dbConnectionPool = DbConnectionPool.getInstance();
 	        
-	        Connection connect1 = dbConnectionPool.getConnection();//Connect to main base
-	        setConnect1(connect1);
+	   //     Connection connect1 = dbConnectionPool.getConnection();//Connect to main base
+	  //      setConnect1(connect1);
 	        
-	        Connection connect2 = con.connectdb("mib_db");//Connect to OID base
-	        setConnect2(connect2);
-	        
+	  //      Connection connect2 = con.connectdb("mib_db");//Connect to OID base
+	  //      setConnect2(connect2);
+	        connect1 = dbConnectionPool.getConnection1();
+	        connect2 = dbConnectionPool.getConnection2();
 	        health.Connect(connect1, connect2);
 	        update.Connect(connect1, connect2);
 	        	        
-	    	int ip1 = 192;
-	    	int ip2 = 168;
-	    	int ip3 = 110;
-	    	int ip4 = 19;
+	    	int ip1 = 10;
+	    	int ip2 = 10;
+	    	int ip3 = 9;
+	    	int ip4 = 3;
 	    	int port = 161;
 	    	String community = "public";
-	    	int mask=224;
+	    	int mask=192;
 	    	String IP;
 	        try {
 	            try {
@@ -102,9 +109,14 @@ public class main {
 
 
 	                IP = "udp:"+ip1+"."+ip2+"."+ip3+"."+ip4+"/"+port;
-	                
-	                update.start();
-	                health.start();
+	                FindDevice f = new FindDevice();
+	        //        f.FindDevice(ip1, ip2, ip3, ip4, mask, port, community);
+	                Universal u = new Universal();
+	                u.Universal("40");
+	           //     Walk w = new Walk();
+	           //     w.walk(IP, "1.3.6.1.2.1.1.1.0", community);
+	              //  update.start();
+	             //   health.start();
 
 	            } finally {
 	                t.stop();

@@ -1,6 +1,7 @@
 package SNMP;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -24,146 +25,98 @@ import org.snmp4j.util.TreeEvent;
 import org.snmp4j.util.TreeUtils;
 
 public class Walk
-    {
+    { 
 
-	    private final static String SNMP_COMMUNITY = "public";
-	    private final static int    SNMP_RETRIES   = 3;
-	    private final static long   SNMP_TIMEOUT   = 1500;
 
+	    private String oidNext;
+	    private String oid;
+	    private String Value;
+	    private int tmp;
+	    private List <String> AllValue = new ArrayList();
+	    private List <String> index = new ArrayList();
+	    private ResponseResult result;
 	    
-	    private Snmp snmp = null;
-	    private TransportMapping transport = null;
-
-	    private String NextOID;
-	    private String Char;
-	    private static String CheckOID;
-	    private static String Com;
 	    
-	    private Set<Integer32> requests = new HashSet<Integer32>();
-
-	    public static String getCom()
+	    public List <String> getIndex()
 		{
-			return Com;
-		}
-
-	    public static void setCom(String com)
-		{
-			Com = com;
-		}
-
-	    public static String getCheckOID()
-	        {
-	    	return CheckOID;
-	        }
-
-	    public static void setCheckOID(String checkOID)
-	        {
-	    	CheckOID = checkOID;
-	        }
-	    
-	    public String getChar()
-		{
-			return Char;
-		}
-
-	    public void setChar(String c)
-		{
-			Char = c;
-		}
-
-	    public String getNextOID()
-		{
-			return NextOID;
-		}
-
-	    public void setNextOID(String nextOID)
-		{
-			NextOID = nextOID;
+			return index;
 		}
 
 
-	    public void onResponse(ResponseEvent event) 
+	    public void setIndex(List <String> index)
 		{
-	        Integer32 requestId = event.getRequest().getRequestID();
-	        PDU response = event.getResponse();
-	        System.out.println(response.get(0).toString());
-	        if(response.get(0).getOid().startsWith(new OID(getCheckOID()))!=false)
-	        	    {
-	        		setChar(response.get(0).toValueString());
-	        	//	System.out.println(response.get(0).toString());
-	        		
-	        		setNextOID(response.get(0).getOid().toString());
-	        	//	System.out.println(response.get(0).getOid().toString());
-	        	    }  else 
-	        		{
-	        		    setChar(null);
-	        		} 	       
-	            
-	        
+			this.index = index;
+		}
 
-	        synchronized (requests) 
-	        {
-	            requests.remove(requestId);
-	        } 
-	            
-	    }
-	    
-	    public void walk(String IP, String[] OID1, String community) throws IOException
+
+	    public List <String> getAllValue()
+		{
+			return AllValue;
+		}
+
+
+	    public void setAllValue(List <String> allValue)
+		{
+			AllValue = allValue;
+		}
+
+
+	    public void walk(String IP, String OID, String community) throws IOException
 	    {
-	        setCheckOID(CheckOID);
-	        setCom(community);
-	        Target t = getTarget(IP);
-	        System.out.println(IP);
-	        System.out.println(OID1);
-	        send(t, new String[] {"1.3.6.1.2.1.1.3", "1.3.6.1.2.1.2.2.1.1", "1.3.6.1.2.1.2.2.1.2"});
-	    }
-	    
-	    private void send(Target target, String[] oids) throws IOException {
-	            PDU pdu = new PDU();
-	            for (String oid: oids) {
-	                pdu.add(new VariableBinding(new OID(oid)));
-	            }
+		
+		oid = OID;
+		oidNext = oid;
+		GetNext n = GetNext.getInstance();
+		Get g = new Get();
+		g.start();
+		
+		AllValue.clear();
+		index.clear();
+		
+		while(oidNext != null)
+		    {
+			n.GetNext(IP, oidNext, oid, community);  //Get interface Index
+			oidNext = n.getNextOID();
+			//System.out.println("nextOID1= "+oidNext);
+			//System.out.println("nextOID= "+oidNext);
+			g.get(IP, oid);
+			//System.out.println(g.getGetChar());
+			if(g.getGetChar() != null )
+			    {
+				Value = g.getGetChar();
+			//	System.out.println("OID= "+oid);
+			//	System.out.println("Value1 "+Value);
+				tmp = oid.length();
+				index.add(oidNext.substring(tmp+1));
+				AllValue.add(Value);
+			    }
+			else
+			    {
+			//	System.out.println("nextOID1.5= "+oidNext);
+			//	n.GetNext(IP, oidNext, oid, community);  //Get interface Index
+			//	oidNext = n.getNextOID();
+				if (oidNext == null) break;
+			//	System.out.println("nextOID2= "+oidNext);
+			//	System.out.println("Value2 "+Value);
+				g.get(IP, oidNext);
+				Value = g.getGetChar();
+			//	System.out.println(oid+" "+Value);
+				tmp = oid.length();
+				index.add(oidNext.substring(tmp+1));
+				AllValue.add(Value);
+			    }
+			
+		//	Value = g.getGetChar();
+			//oidNext = n.getNextOID();
+		//	System.out.println(oid+" "+Value);
+		//	AllValue.add(Value);
+			
+			if (oidNext == null) break;
+		    }
+		
 
-	           // pdu.add(new VariableBinding(new OID(oid)));  
-	            pdu.setType(PDU.GETBULK);
-	            pdu.setMaxRepetitions(5);
+	    }
+	    
 
-	            ResponseEvent event = snmp.send(pdu, target, null );
-	        synchronized (requests) 
-	        {
-	            requests.add(pdu.getRequestID());
-	        }
-	        onResponse(event);
-	    }
 	    
-	    private Target getTarget(String address) {
-	        Address targetAddress = GenericAddress.parse(address);
-	        CommunityTarget target = new CommunityTarget();
-	        target.setCommunity(new OctetString(getCom()));
-	        target.setAddress(targetAddress);
-	        target.setRetries(SNMP_RETRIES);
-	        target.setTimeout(SNMP_TIMEOUT);
-	        target.setVersion(SnmpConstants.version2c);
-	        return target;
-	    }
-	    
-	    public void start() throws IOException {
-	        transport = new DefaultUdpTransportMapping();
-	        snmp = new Snmp(transport);
-	        transport.listen();
-	    }
-	    
-	    public void stop() throws IOException {
-	        try {
-	            if (transport != null) {
-	                transport.close();
-	                transport = null;
-	            }
-	        } finally {
-	            if (snmp != null) {
-	                snmp.close();
-	                snmp = null;
-	            }
-	        }
-	    }
     }

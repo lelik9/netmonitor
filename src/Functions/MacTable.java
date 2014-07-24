@@ -11,17 +11,18 @@ import DB.Connect;
 import NetMonitor.main;
 import SNMP.Get;
 import SNMP.GetNext;
+import SNMP.ResponseResult;
 
 public class MacTable
     {
-		
+	private ResponseResult result;
+	
 	public void MacTable(String device, Connection connect1, Connection connect2) throws IOException, SQLException
 	    {
 
-	        GetNext n = new GetNext();
+		GetNext n = GetNext.getInstance();
 	        main m = new main();
 	        
-	        n.start();
 
 	        
 	        Statement stmt1 = connect1.createStatement();
@@ -79,19 +80,19 @@ public class MacTable
 			while(Char!=null)
 			    {
 				
-				n.GetNext(IP,dot1dTpFdbAddressOID,dot1dTpFdbAddress,community+"@"+vlan);  //Get Vlan name
-				dot1dTpFdbAddressOID = n.getNextOID();
-				Char = n.getChar();
+				result = n.GetNext(IP,dot1dTpFdbAddressOID,dot1dTpFdbAddress,community+"@"+vlan);  //Get Vlan name
+				dot1dTpFdbAddressOID = result.getNextOID();
+				Char = result.getChar();
 				String mac = Char;
 		//		System.out.println("mac: "+mac);
 				//System.out.println("nextOID: "+dot1dTpFdbAddressOID);
 				if(mac==null)break;
 				//dot1dTpFdbAddressOID = n.getNextOID();
 				
-				n.GetNext(IP,dot1dTpFdbPortOID,dot1dTpFdbPort,community+"@"+vlan);  //Get port index
-				String intport = n.getChar();
+				result = n.GetNext(IP,dot1dTpFdbPortOID,dot1dTpFdbPort,community+"@"+vlan);  //Get port index
+				String intport = result.getChar();
 		//		System.out.println(intport);
-				dot1dTpFdbPortOID = n.getNextOID();
+				dot1dTpFdbPortOID = result.getNextOID();
 				/*
 
 

@@ -18,13 +18,9 @@ import DB.select.GetDeviceName;
 import DB.select.GetIntInfo;
 import DB.select.GetMac;
 import DB.select.GetVlan;
-import Functions.ArpTable;
-import Functions.ExtIntInfo;
 import Functions.FindDevice;
-import Functions.InterfaceInfo;
 import Functions.MacTable;
-import Functions.NetworkIPtable;
-import Functions.VlanTable;
+
 import SNMP.GetNext;
 import SNMP.SetChar;
 
@@ -58,13 +54,13 @@ public class ServerHandler implements IoHandler
 
 	public void messageReceived( IoSession session, Object message ) throws Exception
 	    {
-		ExtIntInfo ex =new ExtIntInfo();
+
 	        FindDevice f = new FindDevice();
 	        GetIntInfo i = new GetIntInfo();
 	        GetArp a =new GetArp();
 	        GetVlan v =new GetVlan();
 	        GetMac m = new GetMac();
-	        NetworkIPtable nn = new NetworkIPtable();
+
 	        GetDeviceName dn = new GetDeviceName();
 	        
 		Yaml yaml = new Yaml();
@@ -73,11 +69,7 @@ public class ServerHandler implements IoHandler
 		 
 		switch(data.get("func"))
 		{
-		    case "extintinfo":
-			ex.ExtIntInfo(data.get("device"));
-			System.out.println(dump);
-			session.write(dump);
-			break;
+
 
 		    case "intinfo":
 			i.GetIntInfo(data.get("device"));

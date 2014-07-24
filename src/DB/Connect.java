@@ -9,9 +9,9 @@ import java.sql.SQLException;
 
 public class Connect 
     {
-	private static final String NAME_OF_DATABASE = "monitor_db";
+	//private static final String NAME_OF_DATABASE = "monitor_db";
 	
-	public static Connection connectdb() throws SQLException
+	public static Connection connectdb(String dbName) throws SQLException
 	{
 	   // String driverName = "com.mysql.jdbc.Driver"; 
 
@@ -20,7 +20,7 @@ public class Connect
 		// Create a connection to the database
 		String serverName = "localhost";
 		//String mydatabase = "monitor_db";
-		String url = "jdbc:mysql://" + serverName + "/" + NAME_OF_DATABASE;
+		String url = "jdbc:mysql://" + serverName + "/" + dbName;
 		String username = "root";
 		String password = "[Al_F]";
 
