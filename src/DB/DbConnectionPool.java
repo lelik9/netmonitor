@@ -1,5 +1,6 @@
 package DB;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -15,13 +16,13 @@ public class DbConnectionPool
 	private List<Connection> connections1;
 	private List<Connection> connections2;
 		
-	private DbConnectionPool (){
+	private DbConnectionPool () throws IOException{
 	    connections1 = new ArrayList<Connection>(MAX_NUMBER_OF_CONNECTIONS);
 	    connections2 = new ArrayList<Connection>(MAX_NUMBER_OF_CONNECTIONS);
 	    createConnections();
 	}
 	
-	public static DbConnectionPool getInstance(){
+	public static DbConnectionPool getInstance() throws IOException{
             if(instance == null){
         	synchronized(DbConnectionPool.class){
         	    if(instance == null){
@@ -32,7 +33,7 @@ public class DbConnectionPool
             return instance;
 	}
 	
-	private void createConnections(){
+	private void createConnections() throws IOException{
 	    int i = 0;
 	    while (i < MAX_NUMBER_OF_CONNECTIONS){
 		try
