@@ -31,7 +31,7 @@ public class Universal
 	private String metric;
 	private String oidbase;
 	
-	public void Universal(String deviceID) throws SQLException, IOException
+	public void Universal(String deviceID, int time) throws SQLException, IOException
 	    {
 		connection2 = main.getConnect2();
 		connection1 = main.getConnect1();

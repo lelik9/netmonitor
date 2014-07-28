@@ -22,7 +22,7 @@ import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 
 import server.ServerHandler;
 import threads.HelthTread;
-import threads.UpdateInfoThread;
+import threads.RequestDevice;
 import SNMP.Get;
 import SNMP.GetNext;
 import SNMP.Walk;
@@ -39,8 +39,9 @@ public class main {
     	private static Connection connect2;
     	private static final int PORT = 9123;
     	
-    	static UpdateInfoThread update;
+
     	static HelthTread health;
+    	static RequestDevice request;
 
 	public static Connection getConnect1()
 	    {
@@ -66,8 +67,9 @@ public class main {
 	{
 	        Get t = new Get();
 	        Connect con = new Connect();
-	        update = new UpdateInfoThread();
-	        health = new HelthTread();
+	 //       update = new UpdateInfoThread();
+	//        health = new HelthTread();
+	        request = new RequestDevice();
 	        
 	        GetNext next = GetNext.getInstance();
 	        next.start();
@@ -80,8 +82,8 @@ public class main {
 	  //      setConnect2(connect2);
 	        connect1 = dbConnectionPool.getConnection1();
 	        connect2 = dbConnectionPool.getConnection2();
-	        health.Connect(connect1, connect2);
-	        update.Connect(connect1, connect2);
+	 //       health.Connect(connect1, connect2);
+
 	        	        
 	    	int ip1 = 10;
 	    	int ip2 = 10;
@@ -112,11 +114,12 @@ public class main {
 	                FindDevice f = new FindDevice();
 	        //        f.FindDevice(ip1, ip2, ip3, ip4, mask, port, community);
 	                Universal u = new Universal();
-	                u.Universal("40");
+	            //    u.Universal("40");
 	           //     Walk w = new Walk();
 	           //     w.walk(IP, "1.3.6.1.2.1.1.1.0", community);
-	              //  update.start();
+
 	             //   health.start();
+	                request.start();
 
 	            } finally {
 	                t.stop();
