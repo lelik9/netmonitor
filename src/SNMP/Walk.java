@@ -86,8 +86,11 @@ public class Walk
 				Value = g.getGetChar();
 			//	System.out.println("OID= "+oid);
 			//	System.out.println("Value1 "+Value);
-				tmp = oid.length();
-				index.add(oidNext.substring(tmp+1));
+				if(oidNext!=null )
+				    {
+					tmp = oid.length();
+					index.add(oidNext.substring(tmp+1));
+				    }
 				AllValue.add(Value);
 			    }
 			else

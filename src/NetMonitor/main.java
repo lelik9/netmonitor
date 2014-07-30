@@ -22,12 +22,14 @@ import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 
 import server.ServerHandler;
 import threads.HelthTread;
-import threads.RequestDevice;
+import threads.HistoryClearThread;
+import threads.RequestDeviceThread;
 import SNMP.Get;
 import SNMP.GetNext;
 import SNMP.Walk;
 import DB.Connect;
 import DB.DbConnectionPool;
+import Functions.Calculate;
 import Functions.FindDevice;
 import Functions.Universal;
 
@@ -41,8 +43,8 @@ public class main {
     	
 
     	static HelthTread health;
-    	static RequestDevice request;
-
+    	static RequestDeviceThread request;
+    	static HistoryClearThread history;
 	public static Connection getConnect1()
 	    {
 		    return connect1;
@@ -69,7 +71,9 @@ public class main {
 	        Connect con = new Connect();
 	 //       update = new UpdateInfoThread();
 	//        health = new HelthTread();
-	        request = new RequestDevice();
+	        request = new RequestDeviceThread();
+	        history = new HistoryClearThread();
+
 	        
 	        GetNext next = GetNext.getInstance();
 	        next.start();
@@ -119,7 +123,8 @@ public class main {
 	           //     w.walk(IP, "1.3.6.1.2.1.1.1.0", community);
 
 	             //   health.start();
-	                request.start();
+	              //  history.start();
+	               request.start();
 
 	            } finally {
 	                t.stop();

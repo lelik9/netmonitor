@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -30,8 +31,9 @@ public class Universal
 	private String key;
 	private String metric;
 	private String oidbase;
+	private int history;
 	
-	public void Universal(String deviceID, int time) throws SQLException, IOException
+	public void Universal(String deviceID, int timeout) throws SQLException, IOException
 	    {
 		connection2 = main.getConnect2();
 		connection1 = main.getConnect1();
@@ -46,43 +48,34 @@ public class Universal
 		int n = 0;
 
 	        
-		sel="SELECT IPaddress FROM devices WHERE deviceID ='"+deviceID+"'";			
+		sel="SELECT IPaddress, Community, groupID, Port FROM devices WHERE deviceID ='"+deviceID+"'";			
 		ResultSet res = stmt1.executeQuery(sel);
-	        res.next(); String IPaddress = res.getString(1);
-	        
-		sel="SELECT Community FROM devices WHERE deviceID ='"+deviceID+"'";			
-		res = stmt1.executeQuery(sel);
-	        res.next(); String community = res.getString(1);
-	        
-		sel="SELECT Port FROM devices WHERE deviceID ='"+deviceID+"'";			
-		res = stmt1.executeQuery(sel);
-	        res.next(); String port = res.getString(1);
-	        
-		sel="SELECT groupID FROM devices WHERE deviceID ='"+deviceID+"'";			
-		res = stmt1.executeQuery(sel);
-	        res.next(); String group = res.getString(1);
+	        res.next(); 
+	        String IPaddress = res.getString(1);
+	        String community = res.getString(2);
+	        String group = res.getString(3);
+	        String port = res.getString(4);
+
 
                 String IP = "udp:"+IPaddress+"/"+port;
                 
                 //SELECT TEMPLATE DATA (OID)
-		String sel2 = "SELECT OIDname FROM templates JOIN selectdata ON deviceID='"+deviceID+"'";
+		String sel2 = "SELECT OIDname FROM templates JOIN selectdata ON deviceID='"+deviceID+"' && timeout = '"+timeout+"'";
 		res = stmt1.executeQuery(sel2);
 	        while(res.next())
 	            {
 	        	oid = res.getString(1);
 	        	
-	        	sel="SELECT name FROM templates WHERE OIDname='"+oid+"'";
+	        	//Select data for insert in DATA table
+	        	sel="SELECT name, metric, OIDbase,history FROM templates WHERE OIDname='"+oid+"'";
 		        res2 = stmt3.executeQuery(sel);
-		        res2.next(); key = res2.getString(1);
+		        res2.next(); 
+		        key = res2.getString(1);
+		        metric = res2.getString(2);
+		        oidbase = res2.getString(3);
+		        history = res2.getInt(4);
 		        
-	        	sel="SELECT metric FROM templates WHERE OIDname='"+oid+"'";
-		        res2 = stmt3.executeQuery(sel);
-		        res2.next(); metric = res2.getString(1);
-		        
-	        	sel="SELECT OIDbase FROM templates WHERE OIDname='"+oid+"'";
-		        res2 = stmt3.executeQuery(sel);
-		        res2.next(); oidbase = res2.getString(1);
-		        
+		        //Select oid number for request device
 			sel="SELECT oid FROM "+oidbase+" WHERE object ='"+oid+"'";			
 		        res2 = stmt2.executeQuery(sel);
 		        res2.next(); oidValue = res2.getString(1);
@@ -92,19 +85,32 @@ public class Universal
 	        	Value = w.getAllValue();
 	        	index = w.getIndex();
 	        	if (Value ==null) break;
+	        	
 		        System.out.println("Value get from "+oid);
 		        System.out.println(Value);
 		        System.out.println(index);
+		        //Delete data from DB
+		        ins = "DELETE  FROM group_"+group+"_data WHERE name = '"+key+"'";
+		        stmt3.executeUpdate(ins);
 	        	//Insert data to DB
 		        n=0;
 	        	while(n<Value.size())
 	        	    {
 	        		 Calendar calendar = Calendar.getInstance();
-	        		 java.sql.Timestamp Timestamp = new java.sql.Timestamp(calendar.getTime().getTime());
+	        		 Timestamp Timestamp = new Timestamp(calendar.getTime().getTime());
+	        		 //Insert in group Table
 	        		 ins = "INSERT INTO group_"+group+"_data (time, deviceID, data, OIDindex, name, metric) VALUES "
 	        		 	+ "('"+Timestamp+"','"+deviceID+"','"+Value.get(n)+"', '"+index.get(n)+"','"+key+"', '"+metric+"')";
 	        		 stmt3.executeUpdate(ins);
-	        		 n++;
+	        		//Insert in history Table
+	        		 if(history!=0)
+	        		     {
+	        			 ins = "INSERT INTO history_"+history+"_day (time, deviceID, data, OIDindex, name, metric) VALUES "
+		        		 	+ "('"+Timestamp+"','"+deviceID+"','"+Value.get(n)+"', '"+index.get(n)+"','"+key+"', '"+metric+"')";
+		        		 stmt3.executeUpdate(ins);
+	        		     }
+	        		
+		        		 n++;
 	        	    }
 
 	            }
