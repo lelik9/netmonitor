@@ -98,7 +98,7 @@ public class Walk
 			//	System.out.println("nextOID1.5= "+oidNext);
 			//	n.GetNext(IP, oidNext, oid, community);  //Get interface Index
 			//	oidNext = n.getNextOID();
-				if (oidNext == null) break;
+				if (oidNext == null) {Value = g.getGetChar(); AllValue.add(Value); break;}
 			//	System.out.println("nextOID2= "+oidNext);
 			//	System.out.println("Value2 "+Value);
 				g.get(IP, oidNext);
@@ -109,12 +109,6 @@ public class Walk
 				AllValue.add(Value);
 			    }
 			
-		//	Value = g.getGetChar();
-			//oidNext = n.getNextOID();
-		//	System.out.println(oid+" "+Value);
-		//	AllValue.add(Value);
-			
-			if (oidNext == null) break;
 		    }
 		
 

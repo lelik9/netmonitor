@@ -41,16 +41,19 @@ public class RequestTimer
 				    {
 					//Select device ID for requesting
 					stmt1 = connection1.createStatement();			
-					select = "SELECT deviceID FROM devices";
+					select = "SELECT templateID FROM templates WHERE timeout = '"+time+"'";
 					res = stmt1.executeQuery(select);
-
-					System.out.println("request device");
-					//Execute requesting function while devices not over
 					while(res.next())
 					    {
-						uni.Universal(res.getString(1), time);;
+						select = "SELECT deviceID FROM selectdata WHERE templateID = '"+res.getString(1)+"'";
+						res = stmt1.executeQuery(select);
+					   					
+						//Execute requesting function while devices not over
+						while(res.next())
+						    {
+							uni.Universal(res.getString(1), time);;
+						    }
 					    }
-					
 				    } catch (SQLException | IOException e)
 				    {
 					// TODO Auto-generated catch block

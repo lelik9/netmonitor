@@ -152,13 +152,13 @@ public class FindDevice
 
 		        	if(res.next()==false)
 		        	    {
-		        		String info = "INSERT INTO devices (DeviceName, IPaddress, Community, Port) VALUES ('"+Name1+"', '"+IPtmp+"', '"+community+"', '"+port+"')";
+		        		String info = "INSERT INTO devices (DeviceName, IPaddress, Community, Port) VALUES ('"+Name1.split("\\.")[0]+"', '"+IPtmp+"', '"+community+"', '"+port+"')";
 		        	//	String info = "UPDATE devices SET DeviceName='"+Name1+"',IPaddress='"+IPtmp+"',MACaddress='"+mac+"',Description='"+descr+"'";
 		        		stmt1.executeUpdate(info);
 		        	    }	
 		        	else
 		        	    {
-			        	String info = "UPDATE devices SET DeviceName='"+Name1+"',IPaddress='"+IPtmp+"',Community='"+community+"',Port='"+port+"'";
+			        	String info = "UPDATE devices SET DeviceName='"+Name1.split("\\.")[0]+"',IPaddress='"+IPtmp+"',Community='"+community+"',Port='"+port+"'";
 		        		stmt1.executeUpdate(info);
 		        	    }
 				

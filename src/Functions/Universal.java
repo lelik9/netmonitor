@@ -47,7 +47,7 @@ public class Universal
 		String oidValue;
 		int n = 0;
 
-	        
+
 		sel="SELECT IPaddress, Community, groupID, Port FROM devices WHERE deviceID ='"+deviceID+"'";			
 		ResultSet res = stmt1.executeQuery(sel);
 	        res.next(); 
@@ -60,7 +60,7 @@ public class Universal
                 String IP = "udp:"+IPaddress+"/"+port;
                 
                 //SELECT TEMPLATE DATA (OID)
-		String sel2 = "SELECT OIDname FROM templates JOIN selectdata ON deviceID='"+deviceID+"' && timeout = '"+timeout+"'";
+		String sel2 = "SELECT OIDname FROM templates JOIN selectdata ON deviceID='"+deviceID+"' && timeout = '"+timeout+"' WHERE OIDname!=''";
 		res = stmt1.executeQuery(sel2);
 	        while(res.next())
 	            {
@@ -91,24 +91,16 @@ public class Universal
 		        System.out.println(index);
 		        //Delete data from DB
 		        ins = "DELETE  FROM group_"+group+"_data WHERE name = '"+key+"'";
-		        stmt3.executeUpdate(ins);
+		    //    stmt3.executeUpdate(ins);
 	        	//Insert data to DB
 		        n=0;
 	        	while(n<Value.size())
 	        	    {
-	        		 Calendar calendar = Calendar.getInstance();
-	        		 Timestamp Timestamp = new Timestamp(calendar.getTime().getTime());
+
 	        		 //Insert in group Table
-	        		 ins = "INSERT INTO group_"+group+"_data (time, deviceID, data, OIDindex, name, metric) VALUES "
-	        		 	+ "('"+Timestamp+"','"+deviceID+"','"+Value.get(n)+"', '"+index.get(n)+"','"+key+"', '"+metric+"')";
+	        		 ins = "INSERT INTO group_"+group+"_data (deviceID, data, OIDindex, name, metric) VALUES "
+	        		 	+ "('"+deviceID+"','"+Value.get(n)+"', '"+index.get(n)+"','"+key+"', '"+metric+"')";
 	        		 stmt3.executeUpdate(ins);
-	        		//Insert in history Table
-	        		 if(history!=0)
-	        		     {
-	        			 ins = "INSERT INTO history_"+history+"_day (time, deviceID, data, OIDindex, name, metric) VALUES "
-		        		 	+ "('"+Timestamp+"','"+deviceID+"','"+Value.get(n)+"', '"+index.get(n)+"','"+key+"', '"+metric+"')";
-		        		 stmt3.executeUpdate(ins);
-	        		     }
 	        		
 		        		 n++;
 	        	    }

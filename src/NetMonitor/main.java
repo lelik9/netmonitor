@@ -31,6 +31,7 @@ import DB.Connect;
 import DB.DbConnectionPool;
 import Functions.Calculate;
 import Functions.FindDevice;
+import Functions.NetworkMap;
 import Functions.Universal;
 
 
@@ -116,15 +117,18 @@ public class main {
 
 	                IP = "udp:"+ip1+"."+ip2+"."+ip3+"."+ip4+"/"+port;
 	                FindDevice f = new FindDevice();
-	        //        f.FindDevice(ip1, ip2, ip3, ip4, mask, port, community);
+	    //            f.FindDevice(ip1, ip2, ip3, ip4, mask, port, community);
 	                Universal u = new Universal();
 	            //    u.Universal("40");
 	           //     Walk w = new Walk();
 	           //     w.walk(IP, "1.3.6.1.2.1.1.1.0", community);
-
+	                NetworkMap nm = new NetworkMap();
+	      //         nm.NetMapTable();
+	      //          nm.NetworkMap();
+	                nm.NetMapDump();
 	             //   health.start();
 	              //  history.start();
-	               request.start();
+	  //             request.start();
 
 	            } finally {
 	                t.stop();

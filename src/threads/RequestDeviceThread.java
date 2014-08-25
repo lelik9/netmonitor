@@ -3,6 +3,8 @@ package threads;
 
 import java.io.IOException;
 import java.sql.SQLException;
+
+import timers.FunctionTimer;
 import timers.RequestTimer;
 
 
@@ -15,6 +17,7 @@ public class RequestDeviceThread extends Thread
 	    public void run()
 	    {
 		RequestTimer req = new RequestTimer();
+		FunctionTimer func = new FunctionTimer();
 		
 		do
 		    {
@@ -24,7 +27,7 @@ public class RequestDeviceThread extends Thread
 				{
 				    System.out.println("Thread wake");
 				    req.RequestTimer();
-				    
+				    func.FuctionTimer();
 				}  
 
 					System.out.println("thread sleep");
