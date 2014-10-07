@@ -7,11 +7,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.snmp4j.smi.OctetString;
+import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.Yaml;
 
+import server.ServerHandler;
 import DB.Connect;
 import NetMonitor.main;
 import SNMP.Get;
@@ -26,25 +30,24 @@ public class FindDevice
     private Connection connection2;
     private List<String> Value;
 	
-	public void FindDevice(int ip1, int ip2,int ip3,int ip4,int mask,int port, String community)
+	public void FindDevice(Map<String, String> data)
 		    throws IOException, SQLException
 		    {
-		  //      Get t = new Get();
-		 //       GetNext n = GetNext.getInstance();
-		        Walk w = new Walk();
-		//        InterfaceInfo i = new InterfaceInfo();
 
-		//        main m = new main();
-		//        MacTable mt = new MacTable();
-		//        VlanTable vt = new VlanTable();
-		//        ArpTable at = new ArpTable();
-		        
-		 //       t.start();
-		        		        
+		        Walk w = new Walk();
+
+		        System.out.println(data);		        
 		        connection1 = main.getConnect1();
 		        connection2 = main.getConnect2();
 		        Statement stmt1 = connection1.createStatement();
-		        	        
+		        
+		        int mask = Integer.parseInt(data.get("mask"));
+		        int ip1 = Integer.parseInt(data.get("ip1"));
+		        int ip2 = Integer.parseInt(data.get("ip2"));
+		        int ip3 = Integer.parseInt(data.get("ip3"));
+		        int ip4 = Integer.parseInt(data.get("ip4"));
+		        int port = Integer.parseInt(data.get("port"));
+		        String community = data.get("community");
 					
 		        int wildcard=255-mask;
 		        int tmpIP4=wildcard;
@@ -177,11 +180,22 @@ public class FindDevice
 
 		    	
 		    }
+	public void Dump()
+	    {
+		ServerHandler srv = new ServerHandler();
+		List<String> status = new ArrayList<String>();
+		status.add("complete");
+		Map<Integer, List <String>> data = new HashMap<Integer, List <String>>();
+		
+		data.put(0, status);
+		
+		DumperOptions options = new DumperOptions();
+		Yaml yaml = new Yaml(options);
+		int i = yaml.dump(data).length();
+		options.setWidth(i);
+		srv.setDump(yaml.dump(data));
+	    }
 	
-	 public synchronized void Connect(Connection connect1, Connection connect2)
-	     {
-		 connection1 = connect1;
-		 connection2 = connect2;
-	     }
+
 
 }

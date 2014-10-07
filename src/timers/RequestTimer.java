@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
-
+import threads.RequestThread;
 import Functions.Universal;
 import NetMonitor.main;
 
@@ -34,9 +34,7 @@ public class RequestTimer
 	    @Override
 	    public void run()
 		      {
-
-				Universal uni = new Universal();
-				
+			
 				try
 				    {
 					//Select device ID for requesting
@@ -48,13 +46,18 @@ public class RequestTimer
 						select = "SELECT deviceID FROM selectdata WHERE templateID = '"+res.getString(1)+"'";
 						res = stmt1.executeQuery(select);
 					   					
-						//Execute requesting function while devices not over
+						//Execute requesting thread while devices not over
 						while(res.next())
 						    {
-							uni.Universal(res.getString(1), time);;
+							RequestThread request = new RequestThread(res.getString(1), time);
+							System.out
+								.println(res.getString(1));
+						//	Universal uni = new Universal();
+						//	uni.Universal(res.getString(1), time);
+							request.start();
 						    }
 					    }
-				    } catch (SQLException | IOException e)
+				    } catch (SQLException e)
 				    {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -82,7 +85,7 @@ public class RequestTimer
 			timers1.add( time);
 			System.out.println(time);
 			RequestTask task = new RequestTask(time);
-			timer.scheduleAtFixedRate(task, time*1000,time*1000);
+			timer.schedule(task, time*1000,time*1000);
 		    }
 		    
 	     }

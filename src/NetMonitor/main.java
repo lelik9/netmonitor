@@ -127,8 +127,8 @@ public class main {
 	      //          nm.NetworkMap();
 	                nm.NetMapDump();
 	             //   health.start();
-	              //  history.start();
-	  //             request.start();
+	              //  history.start(); // Поток создания истории
+	        //       request.start(); //Поток опроса устройств
 
 	            } finally {
 	                t.stop();

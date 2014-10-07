@@ -1,6 +1,7 @@
 package server;
 
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.sql.Connection;
@@ -12,15 +13,25 @@ import org.yaml.snakeyaml.Yaml;
 
 
 
+
+
+
+
+
+
+import server.remoteFunctions.ButtonSelect;
+import server.remoteFunctions.DeviceDataSelect;
+import server.remoteFunctions.DeviceGroupSelect;
 import DB.Connect;
 import DB.select.GetArp;
+import DB.select.GetConfInfo;
 import DB.select.GetDeviceName;
 import DB.select.GetIntInfo;
 import DB.select.GetMac;
 import DB.select.GetVlan;
+import DB.update.DevGroupUpdate;
 import Functions.FindDevice;
 import Functions.MacTable;
-
 import SNMP.GetNext;
 import SNMP.SetChar;
 
@@ -66,17 +77,53 @@ public class ServerHandler implements IoHandler
 		Yaml yaml = new Yaml();
 		System.out.println(message);
 		Map<String, String> data = (Map<String, String>) yaml.load(message.toString());
-		 
+
 		switch(data.get("func"))
 		{
+		    
+		    case "test":
+			System.out.println("all work!");
+			break;
 
-
-		    case "intinfo":
-			i.GetIntInfo(data.get("device"));
+		    case "button":
+			ButtonSelect butSelect = new ButtonSelect();
+			butSelect.ButtonSelect(data.get("windowName"));
+			session.write(dump);
 			System.out.println(dump);
+			break;
+			
+		    case "groups":
+			DeviceGroupSelect devSelect = new DeviceGroupSelect();
+			devSelect.DeviceGroupSelect();
+			session.write(dump);
+			System.out.println(dump);
+			break;
+			
+		    case "devInfo":
+			DeviceDataSelect dataSelect = new DeviceDataSelect();
+			dataSelect.DeviceDataSelect(data);
 			session.write(dump);
 			break;
 			
+		    case "DiscoverDevice":
+			FindDevice findDev = new FindDevice();
+			findDev.FindDevice(data);
+			session.write(dump);
+			break;
+			
+		    case "confDevice":
+			GetConfInfo confInf = new GetConfInfo();
+			confInf.GetConfInfo(data);
+			session.write(dump);
+			break;
+			
+		    case "DevGroupUpdate":
+			DevGroupUpdate update = new DevGroupUpdate();
+			update.DevGroupUpdate(data);			
+			session.write(dump);
+			break;
+
+	//OLD		
 		    case "vlantable":
 			v.GetVlan(data.get("device"));
 			session.write(dump);
@@ -92,11 +139,6 @@ public class ServerHandler implements IoHandler
 			session.write(dump);
 			break;
 			
-		    case "finddev":
-			f.FindDevice(Integer.parseInt(data.get("ip1")), Integer.parseInt(data.get("ip2")), 
-				Integer.parseInt(data.get("ip3")), Integer.parseInt(data.get("ip4")), 
-				Integer.parseInt(data.get("mask")), Integer.parseInt(data.get("port")), data.get("community"));
-			break;
 			
 		    case "devices":
 			dn.GetDeviceName(data.get("device"), data.get("group"));

@@ -98,19 +98,24 @@ public class Walk
 			//	System.out.println("nextOID1.5= "+oidNext);
 			//	n.GetNext(IP, oidNext, oid, community);  //Get interface Index
 			//	oidNext = n.getNextOID();
-				if (oidNext == null) {Value = g.getGetChar(); AllValue.add(Value); break;}
+				if (oidNext == null) {
+				    if(g.getGetChar() == null) break;
+				    Value = g.getGetChar(); 
+				    AllValue.add(Value); 
+				    break;
+				    }
 			//	System.out.println("nextOID2= "+oidNext);
 			//	System.out.println("Value2 "+Value);
 				g.get(IP, oidNext);
+				if(g.getGetChar() == null) break;
 				Value = g.getGetChar();
-			//	System.out.println(oid+" "+Value);
 				tmp = oid.length();
 				index.add(oidNext.substring(tmp+1));
 				AllValue.add(Value);
 			    }
 			
 		    }
-		
+
 
 	    }
 	    

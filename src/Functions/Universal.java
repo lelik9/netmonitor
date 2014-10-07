@@ -47,7 +47,7 @@ public class Universal
 		String oidValue;
 		int n = 0;
 
-
+		//Get device info
 		sel="SELECT IPaddress, Community, groupID, Port FROM devices WHERE deviceID ='"+deviceID+"'";			
 		ResultSet res = stmt1.executeQuery(sel);
 	        res.next(); 
@@ -89,9 +89,10 @@ public class Universal
 		        System.out.println("Value get from "+oid);
 		        System.out.println(Value);
 		        System.out.println(index);
+		        System.out.println(Value.size());
 		        //Delete data from DB
-		        ins = "DELETE  FROM group_"+group+"_data WHERE name = '"+key+"'";
-		    //    stmt3.executeUpdate(ins);
+		        ins = "DELETE  FROM group_"+group+"_data WHERE name = '"+key+"' && deviceID='"+deviceID+"'";
+		        stmt3.executeUpdate(ins);
 	        	//Insert data to DB
 		        n=0;
 	        	while(n<Value.size())
