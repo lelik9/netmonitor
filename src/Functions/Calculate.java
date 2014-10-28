@@ -14,8 +14,8 @@ import SNMP.Walk;
 public class Calculate
     {
 	private  String OIDindex;
-	private Connection connection1 = main.getConnect1();
-	private Connection connection2 = main.getConnect2();
+	private Connection connection1;
+	private Connection connection2;
 	private String select;
 	private Statement stmt1;
 	private Statement stmt2;

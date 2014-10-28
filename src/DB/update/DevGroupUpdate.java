@@ -23,6 +23,7 @@ public class DevGroupUpdate
 	private ResultSet res;
 	private Map<Integer, List <String>> Data = new HashMap<Integer, List <String>>();
 	private List<String> result = new ArrayList<>();
+	
 	public void DevGroupUpdate(Map<String, String> data)
 	    {
 		switch(data.get("update"))

@@ -17,6 +17,10 @@ import org.json.simple.JSONObject;
 import NetMonitor.main;
 import SNMP.Walk;
 
+/**
+ * @author Alex
+ * Class generate network devices graph
+ */
 public class NetworkMap
     {
 	private Connection connection1 = main.getConnect1();

@@ -28,7 +28,11 @@ public class GetConfInfo
 		switch(data.get("confFunc"))
 		{
 		    case "devInfo":
-			DeviceInfo();
+			DeviceInfo(data.get("name"));
+			break;
+			
+		    case "devFullInfo":
+			DeviceFullInfo();
 			break;
 			
 		    case "groupInfo":
@@ -41,7 +45,7 @@ public class GetConfInfo
 	
 	
 	//Получаем все группы устройств и дейвасы которые в них входят
-	private void DeviceInfo()
+	private void DeviceFullInfo()
 	    {
 		connection1 = main.getConnect1();
 		
@@ -88,6 +92,37 @@ public class GetConfInfo
 			stmt1 = connection1.createStatement();
 			
 			select = "SELECT groupName, groupID FROM group_name";
+			res = stmt1.executeQuery(select);
+
+			while(res.next())
+			    {				
+				selectName.add(res.getString(1));
+				selectId.add(res.getString(2));
+				
+			    }
+			Data.put(0,selectName);
+			Data.put(1,selectId);
+			
+		    } catch (SQLException e)
+		    {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		    }
+
+		Dump();
+	    }
+	
+	private void DeviceInfo(String groupName)
+	    {
+		connection1 = main.getConnect1();
+		List <String> selectName = new ArrayList();
+		List <String> selectId = new ArrayList();
+		
+		try
+		    {
+			stmt1 = connection1.createStatement();
+			
+			select = "SELECT DeviceName, deviceID FROM devices join group_name where group_name.groupName='"+groupName+"' && group_name.groupID=devices.GroupID";
 			res = stmt1.executeQuery(select);
 
 			while(res.next())

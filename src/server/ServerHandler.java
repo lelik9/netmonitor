@@ -19,6 +19,7 @@ import org.yaml.snakeyaml.Yaml;
 
 
 
+
 import server.remoteFunctions.ButtonSelect;
 import server.remoteFunctions.DeviceDataSelect;
 import server.remoteFunctions.DeviceGroupSelect;
@@ -30,6 +31,7 @@ import DB.select.GetIntInfo;
 import DB.select.GetMac;
 import DB.select.GetVlan;
 import DB.update.DevGroupUpdate;
+import DB.update.DeviceUpdate;
 import Functions.FindDevice;
 import Functions.MacTable;
 import SNMP.GetNext;
@@ -118,10 +120,17 @@ public class ServerHandler implements IoHandler
 			break;
 			
 		    case "DevGroupUpdate":
-			DevGroupUpdate update = new DevGroupUpdate();
-			update.DevGroupUpdate(data);			
+			DevGroupUpdate groupUpdate = new DevGroupUpdate();
+			groupUpdate.DevGroupUpdate(data);			
 			session.write(dump);
 			break;
+			
+		    case "DevUpdate":
+			DeviceUpdate devUpdate = new DeviceUpdate();
+			devUpdate.DeviceUpdate(data);		
+			session.write(dump);
+			break;
+			
 
 	//OLD		
 		    case "vlantable":

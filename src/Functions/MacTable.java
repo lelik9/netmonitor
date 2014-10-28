@@ -6,58 +6,65 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 
 import DB.Connect;
 import NetMonitor.main;
 import SNMP.Get;
 import SNMP.GetNext;
 import SNMP.ResponseResult;
+import SNMP.Walk;
 
 public class MacTable
     {
-	private ResponseResult result;
+
+	private String sel;
+	private Statement stmt1;
+	private Statement stmt2;
+	private Statement stmt3;
+	private ResultSet res;
+	private Connection connection1;
+	private Connection connection2;
+	private List<String> Mac;
+	private List<String> Port;
+	private List<String> PortIndex;
+	private List<String> Name;
+	private List<String> Vlan;
 	
-	public void MacTable(String device, Connection connect1, Connection connect2) throws IOException, SQLException
+	public void MacTable(String device) throws IOException, SQLException
 	    {
 
-		GetNext n = GetNext.getInstance();
-	        main m = new main();
+		Walk walk = new Walk();//SNMP walker
 	        
-
-	        
-	        Statement stmt1 = connect1.createStatement();
-	        Statement stmt3 = connect1.createStatement();
-	        
-	        Statement stmt2 = connect2.createStatement();
+		connection1 = main.getConnect1();
+		connection2 = main.getConnect2();
+		
+		stmt1 = connection1.createStatement();
+		stmt2 = connection2.createStatement();
+		stmt3 = connection1.createStatement();//Used for inserting to table;
 	        
 	        //Reading OID from base      
-	        String  sel = "SELECT oid FROM public_oid WHERE object = 'dot1dTpFdbAddress'";	        
-	        ResultSet res = stmt2.executeQuery(sel);
+		sel = "SELECT oid FROM public_oid WHERE object = 'dot1dTpFdbAddress'"; //A unicast MAC address
+		res = stmt2.executeQuery(sel);
 	        res.next(); String dot1dTpFdbAddress = res.getString(1);
-	        String dot1dTpFdbAddressOID = dot1dTpFdbAddress;
-	        
-	        sel = "SELECT oid FROM public_oid WHERE object = 'dot1dTpFdbPort'";	        
+
+	        sel = "SELECT oid FROM public_oid WHERE object = 'dot1dTpFdbPort'"; //port
 	        res = stmt2.executeQuery(sel);
 	        res.next(); String dot1dTpFdbPort = res.getString(1);
-	        String dot1dTpFdbPortOID = dot1dTpFdbPort;
 	        
-	        sel = "SELECT oid FROM public_oid WHERE object = 'dot1dBasePortIfIndex'";	        
+	        sel = "SELECT oid FROM public_oid WHERE object = 'dot1dBasePortIfIndex'";//port index	        
 	        res = stmt2.executeQuery(sel);
 	        res.next(); String dot1dBasePortIfIndex = res.getString(1);
-	        String dot1dBasePortIfIndexOID = dot1dBasePortIfIndex;
+
 	        
 	        //Reading device IP from main base
-	        sel = "SELECT IPaddress FROM devices WHERE DeviceName='"+device+"'";
+	        sel = "SELECT IPaddress, Community, Port, GroupID  FROM devices WHERE DeviceName='"+device+"'";
 	        res = stmt1.executeQuery(sel);
-	        res.next(); String IP = res.getString(1);
-	        
-		sel = "SELECT Community FROM Devices WHERE DeviceName = '"+device+"'";
-		res = stmt1.executeQuery(sel);
-		res.next(); String community = res.getString(1);
-		
-		sel = "SELECT Port FROM Devices WHERE DeviceName = '"+device+"'";
-		res = stmt1.executeQuery(sel);
-		res.next(); String port = res.getString(1);
+	        res.next(); 
+	        String IP = res.getString(1);
+	        String community = res.getString(2);
+	        String port = res.getString(3);
+	        String group = res.getString(4);
 	        
 	        IP = "udp:"+IP+"/"+port;//Set address of device (CHANGE PORT)
 	        
@@ -71,47 +78,39 @@ public class MacTable
 		while(res.next())
 		    {
 			String vlan = res.getString(1);
-			String Char ="";
-		//	System.out.println("vlan :"+vlan);
 
-			dot1dTpFdbAddressOID = dot1dTpFdbAddress;
-			dot1dTpFdbPortOID = dot1dTpFdbPort;
-			dot1dBasePortIfIndexOID = dot1dBasePortIfIndex;
-			while(Char!=null)
-			    {
-				
-				result = n.GetNext(IP,dot1dTpFdbAddressOID,dot1dTpFdbAddress,community+"@"+vlan);  //Get Vlan name
-				dot1dTpFdbAddressOID = result.getNextOID();
-				Char = result.getChar();
-				String mac = Char;
-		//		System.out.println("mac: "+mac);
-				//System.out.println("nextOID: "+dot1dTpFdbAddressOID);
-				if(mac==null)break;
-				//dot1dTpFdbAddressOID = n.getNextOID();
-				
-				result = n.GetNext(IP,dot1dTpFdbPortOID,dot1dTpFdbPort,community+"@"+vlan);  //Get port index
-				String intport = result.getChar();
-		//		System.out.println(intport);
-				dot1dTpFdbPortOID = result.getNextOID();
-				/*
+				walk.walk(IP, dot1dTpFdbAddress, community+"@"+vlan);
+				Mac = walk.getAllValue();
 
+				if(Mac==null)break;
 
-				System.out.println(dot1dBasePortIfIndexOID);
-				n.GetNext(IP,dot1dBasePortIfIndexOID,dot1dBasePortIfIndex,community+"@"+vlan);  //Get interface index
-				String numport = n.getChar();
-				System.out.println("port:"+numport);
-				dot1dBasePortIfIndexOID = n.getNextOID();
+				walk.walk(IP, dot1dTpFdbPort, community+"@"+vlan);
+				Port = walk.getAllValue();
 				
-				if(numport ==null) break;
+				int n = 0;
+				while(Port.size() > n)
+				    {
+					walk.walk(IP, dot1dBasePortIfIndex+"."+Port.get(n), community);//Get interface index
+					PortIndex = walk.getAllValue();
+				    }
 				
-				sel = "SELECT intName FROM intinfo WHERE intIndex = '"+numport+"'"; //Get interface name
-				ResultSet res2 = stmt1.executeQuery(sel);
-				res2.next(); String nameport = res2.getString(1);
-				
-				sel = "INSERT INTO mactable VALUES ('"+device+"', '"+nameport+"', '"+mac+"', '"+vlan+"')";
-				stmt1.executeUpdate(sel);*/
-				
-			    }
+				n = 0;
+				while(Port.size() > n)
+				    {
+					sel = "SELECT data FROM group_"+group+"_data join templates where templates.OIDname='ifDescr' && group_"+group+"_data.name=templates.name && group_"+group+"_data.OIDindex= = '"+Port.get(n)+"'"; //Get interface name
+					ResultSet res2 = stmt1.executeQuery(sel);
+					res2.next(); 
+					Name.add(res2.getString(1));
+					n++;
+				    }
+				Vlan.add(vlan);
+			    
+		    }
+		int i = 0;
+		while(Mac.size() > i)
+		    {
+			sel = "INSERT INTO mactable VALUES ('"+device+"', '"+Name.get(i)+"', '"+Mac.get(i)+"', '"+Vlan.get(i)+"')";
+			stmt1.executeUpdate(sel);
 		    }
 	    }
     }

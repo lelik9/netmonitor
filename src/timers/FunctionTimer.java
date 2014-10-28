@@ -11,6 +11,7 @@ import java.util.TimerTask;
 
 import timers.RequestTimer.RequestTask;
 import Functions.Calculate;
+import Functions.MacTable;
 import NetMonitor.main;
 
 public class FunctionTimer
@@ -41,7 +42,7 @@ public class FunctionTimer
 			    {
 				//Select device ID for requesting
 				stmt1 = connection1.createStatement();			
-				select = "SELECT templateID FROM templates WHERE timeout = '"+time+"'";
+				select = "SELECT templateID FROM templates WHERE timeout = '"+time+"' && functions!=''";
 				res = stmt1.executeQuery(select);
 				while(res.next())
 				    {
@@ -62,6 +63,11 @@ public class FunctionTimer
 							{
 							    case "InSpeedCalc":
 								calc.InSpeedCalc(deviceID, time, "InSpeedCalc");
+								break;
+							    case "MacTable":
+								MacTable mac = new MacTable();
+								mac.MacTable(deviceID);
+								break;
 								
 							}
 						    }
