@@ -66,18 +66,9 @@ public class DeviceUpdate
 			Data.put(0, result);
 			e.printStackTrace();
 		    }
-		Dump();
+		server.Dump dump = new server.Dump();
+		dump.Dump(Data);
 	    }
 	
-	public void Dump()
-	    {
-		ServerHandler srv = new ServerHandler();
-		
-		
-		DumperOptions options = new DumperOptions();
-		Yaml yaml = new Yaml(options);
-		int i = yaml.dump(Data).length();
-		options.setWidth(i);
-		srv.setDump(yaml.dump(Data));
-	    }
+
     }

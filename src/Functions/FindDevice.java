@@ -22,7 +22,11 @@ import SNMP.Get;
 import SNMP.GetNext;
 import SNMP.Walk;
 
-
+/**
+ * 
+ * @author Alex
+ *
+ */
 public class FindDevice 
 {
     private PreparedStatement preparedStatement = null;
@@ -30,6 +34,12 @@ public class FindDevice
     private Connection connection2;
     private List<String> Value;
 	
+    /**
+	 * 
+	 * @param data (mask:последние октет маски, ip1:, ip2:, ip3:, ip4: с первого по четвертый октет адреса, port: порт SNMP, community: комьюнити)
+	 * @throws IOException
+	 * @throws SQLException
+	 */
 	public void FindDevice(Map<String, String> data)
 		    throws IOException, SQLException
 		    {
@@ -62,22 +72,7 @@ public class FindDevice
 		        ResultSet res = preparedStatement.executeQuery();
 		        res.next(); String sysName = res.getString(1);
 		        String sysNameOID = sysName;
-		        
-	/*	        preparedStatement.setString(1, "sysDescr");
-		        res = preparedStatement.executeQuery();
-		        res.next(); String sysDescr = res.getString(1);
-		        String sysDescrOID = sysDescr;
-		        
-		        preparedStatement.setString(1, "ifPhysAddress");
-		        res = preparedStatement.executeQuery();
-		        res.next(); String ifPhysAddress = res.getString(1);
-		        String ifPhysAddressOID = ifPhysAddress;
-		        
-		        preparedStatement.setString(1, "ipAdEntIfIndex");
-		        res = preparedStatement.executeQuery();
-		        res.next(); String ipAdEntIfIndex = res.getString(1);
-		        String ipAdEntIfIndexOID = ipAdEntIfIndex;*/
-		        
+		        	        
 
 		        //Checking for subnet
 	        	if(ip4<wildcard)
@@ -103,72 +98,30 @@ public class FindDevice
 		    	{
 		    	    String IPtmp = ip1+"."+ip2+"."+ip3+"."+ip4;    	    
 		    	    IP = "udp:"+ip1+"."+ip2+"."+ip3+"."+ip4+"/"+port;
-		    	    System.out.println(IP);
-		    	    
-                        //    t.get(IP,sysName);
-                       //    Name=t.getGetChar();
-                            
+		    	    System.out.println(IP);   	    
+                               
                             w.walk(IP,sysName,community);
                             Value = w.getAllValue();
-                            String Name1 = Value.get(0);
-                        //   String Name1 = Name;
-		            if(Name1!=null)
+
+		            if(Value.size() !=0 )
 		            {
-		        	System.out.println("Device name: "+Name1);
-		        /*	
-		        	//Get information of devices in network
-		                n.GetNext(IP,sysDescrOID,sysDescr, community);  //Get interface description
-		                String descr=n.getChar();
-		              //  String descr = Name;
-		                sysDescrOID = n.getNextOID();
-		        	//System.out.println("Device description: "+Name);
-		            
-		                n.GetNext(IP,ipAdEntIfIndexOID,ipAdEntIfIndex, community);  //Get interface index
-		                String ind=n.getChar();
-		                ipAdEntIfIndexOID = n.getNextOID();
-		                System.out.println("-> "+ind);
-		                n.GetNext(IP,ifPhysAddress+"."+ind,ifPhysAddress, community);  //Get interface mac
-		                String mac=n.getChar();
-		               // String mac = Name; 
-		        //	System.out.println("Device Mac address: "+Name);
-		        	*/
-		        /*	w.walk(IP, sysDescr, community);
-		        	Value = w.getAllValue();
-		        	String descr = Value.get(0);
-		        	
-		        	w.walk(IP, ipAdEntIfIndex, community);
-		        	Value = w.getAllValue();
-		        	String ind = Value.get(0);
-		        	System.out.println("-> "+ind);
-		        	w.walk(IP, ifPhysAddress+"."+ind, community);
-		        	Value = w.getAllValue();
-		        	String mac = Value.get(0);*/
-		        	
+	                           String Name1 = Value.get(0);
+			        	
 		        	String Sel = "SELECT DeviceName FROM devices WHERE DeviceName = '"+Name1+"'";
-		        	/*preparedStatement = connection.prepareStatement("SELECT ? FROM ? WHERE ? = ?");
-		        	preparedStatement.setString(1, "DeviceName");
-		        	preparedStatement.setString(2, "devices");
-		        	preparedStatement.setString(3, "DeviceName");
-		        	preparedStatement.setString(4, Name1);
-		        	boolean res = preparedStatement.execute();*/
 		        	res = stmt1.executeQuery(Sel);
 
-		        	if(res.next()==false)
-		        	    {
-		        		String info = "INSERT INTO devices (DeviceName, IPaddress, Community, Port) VALUES ('"+Name1.split("\\.")[0]+"', '"+IPtmp+"', '"+community+"', '"+port+"')";
-		        	//	String info = "UPDATE devices SET DeviceName='"+Name1+"',IPaddress='"+IPtmp+"',MACaddress='"+mac+"',Description='"+descr+"'";
+		        	if(res.next() == false)
+		        	    {		        		
+		        		String info = "INSERT INTO devices (DeviceName, IPaddress, Community, Port, GroupID) VALUES "
+		        			+ "('"+Name1.split("\\.")[0]+"', '"+IPtmp+"', '"+community+"', '"+port+"', '1')";
 		        		stmt1.executeUpdate(info);
 		        	    }	
 		        	else
 		        	    {
-			        	String info = "UPDATE devices SET DeviceName='"+Name1.split("\\.")[0]+"',IPaddress='"+IPtmp+"',Community='"+community+"',Port='"+port+"'";
+			        	String info = "UPDATE devices SET IPaddress='"+IPtmp+"',Community='"+community+"',Port='"+port+"' WHERE DeviceName='"+Name1.split("\\.")[0]+"'";
 		        		stmt1.executeUpdate(info);
 		        	    }
 				
-				//i.GetIntInfo(Name1, connection1, connection2);
-				//vt.VlanTable(Name1, connection1, connection2);
-				//at.GetArp(Name1, connection1, connection2);
-				//mt.MacTable(Name1, connection1, connection2);
 				
 		            }
 		            
@@ -177,25 +130,13 @@ public class FindDevice
 		            
 		    	}
 		    	
-
-		    	
+			List<String> status = new ArrayList<String>();
+			status.add("Устройства добавленны");
+			Map<Integer, List <String>> Data = new HashMap<Integer, List <String>>();
+			
+			Data.put(0, status);
+			server.Dump dump = new server.Dump();
+			dump.Dump(Data);
 		    }
-	public void Dump()
-	    {
-		ServerHandler srv = new ServerHandler();
-		List<String> status = new ArrayList<String>();
-		status.add("complete");
-		Map<Integer, List <String>> data = new HashMap<Integer, List <String>>();
-		
-		data.put(0, status);
-		
-		DumperOptions options = new DumperOptions();
-		Yaml yaml = new Yaml(options);
-		int i = yaml.dump(data).length();
-		options.setWidth(i);
-		srv.setDump(yaml.dump(data));
-	    }
-	
-
 
 }

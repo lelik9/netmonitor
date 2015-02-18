@@ -15,7 +15,7 @@ import org.yaml.snakeyaml.Yaml;
 import server.ServerHandler;
 import NetMonitor.main;
 
-public class GetConfInfo
+public class GetTemplatesInfo
     {
 	private Connection connection1;
 	private String select;
@@ -23,29 +23,30 @@ public class GetConfInfo
 	private ResultSet res;
 	private Map<Integer, List <String>> Data = new HashMap<Integer, List <String>>();
 	
-	public void GetConfInfo(Map<String, String> data)
+	public void GetTemplatesInfo(Map<String, String> data)
 	    {
 		switch(data.get("confFunc"))
 		{
-		    case "devInfo":
-			DeviceInfo(data.get("name"));
+		    case "templateFullInfo":
+			TemplateFullInfo();
 			break;
 			
-		    case "devFullInfo":
-			DeviceFullInfo();
+		    case "templateInfo":
+			TemplateInfo();
 			break;
 			
-		    case "groupInfo":
-			GroupInfo();
+		    case "getElements":
+			GetElement();
 			break;
-			
 			
 		}
+
 	    }
-	
-	
-	//Получаем все группы устройств и дейвасы которые в них входят
-	private void DeviceFullInfo()
+
+	/**
+	 * Получиние всех элементов и их групп
+	 */
+	private void GetElement()
 	    {
 		connection1 = main.getConnect1();
 		
@@ -53,7 +54,7 @@ public class GetConfInfo
 		    {
 			stmt1 = connection1.createStatement();
 			
-			select = "SELECT DeviceName, IPaddress, Community, port, groupName FROM devices Inner join group_name on devices.GroupID = group_name.groupID";
+			select = "SELECT name FROM templates GROUP BY name";
 			res = stmt1.executeQuery(select);
 			int i =0;
 			while(res.next())
@@ -61,10 +62,80 @@ public class GetConfInfo
 				List <String> selectInf = new ArrayList();
 				
 				selectInf.add(res.getString(1));
-				selectInf.add(res.getString(2));
-				selectInf.add(res.getString(3));
+			
+				Data.put(i,selectInf);
+				i++;
+
+			    }
+			
+		    } catch (SQLException e)
+		    {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		    }
+		server.Dump dump = new server.Dump();
+		dump.Dump(Data);
+		
+	    }
+
+	private void TemplateInfo()
+	    {
+		connection1 = main.getConnect1();
+		
+		try
+		    {
+			stmt1 = connection1.createStatement();
+			
+			select = "SELECT templateName FROM template_name";
+			res = stmt1.executeQuery(select);
+			int i =0;
+			while(res.next())
+			    {
+				List <String> selectInf = new ArrayList();
+				
+				selectInf.add(res.getString(1));
+			
+				Data.put(i,selectInf);
+				i++;
+
+			    }
+			
+		    } catch (SQLException e)
+		    {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		    }
+		server.Dump dump = new server.Dump();
+		dump.Dump(Data);
+		
+	    }
+
+	private void TemplateFullInfo()
+	    {
+		connection1 = main.getConnect1();
+		
+		try
+		    {
+			stmt1 = connection1.createStatement();
+			
+			select = "SELECT name, OIDname, functions, metric, timeout, history, templateName FROM templates Inner join template_name on templates.templateID = template_name.templateID";
+			res = stmt1.executeQuery(select);
+			int i =0;
+			while(res.next())
+			    {
+				List <String> selectInf = new ArrayList();
+				
+				selectInf.add(res.getString(1));
+				if(res.getString(2).equals(""))
+				    selectInf.add(res.getString(3));
+				else selectInf.add(res.getString(2));
 				selectInf.add(res.getString(4));
 				selectInf.add(res.getString(5));
+				selectInf.add(res.getString(6));
+				if(res.getString(5).equals("0"))
+				    selectInf.add("Не активно");
+				else selectInf.add("Активно");				    
+				selectInf.add(res.getString(7));
 				
 				Data.put(i,selectInf);
 				i++;
@@ -76,75 +147,9 @@ public class GetConfInfo
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		    }
-
 		server.Dump dump = new server.Dump();
 		dump.Dump(Data);
-
-	    }
-	
-	private void GroupInfo()
-	    {
-		connection1 = main.getConnect1();
-		List <String> selectName = new ArrayList();
-		List <String> selectId = new ArrayList();
 		
-		try
-		    {
-			stmt1 = connection1.createStatement();
-			
-			select = "SELECT groupName, groupID FROM group_name";
-			res = stmt1.executeQuery(select);
-
-			while(res.next())
-			    {				
-				selectName.add(res.getString(1));
-				selectId.add(res.getString(2));
-				
-			    }
-			Data.put(0,selectName);
-			Data.put(1,selectId);
-			
-		    } catch (SQLException e)
-		    {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		    }
-
-		server.Dump dump = new server.Dump();
-		dump.Dump(Data);
 	    }
-	
-	private void DeviceInfo(String groupName)
-	    {
-		connection1 = main.getConnect1();
-		List <String> selectName = new ArrayList();
-		List <String> selectId = new ArrayList();
-		
-		try
-		    {
-			stmt1 = connection1.createStatement();
-			
-			select = "SELECT DeviceName, deviceID FROM devices join group_name where group_name.groupName='"+groupName+"' && group_name.groupID=devices.GroupID";
-			res = stmt1.executeQuery(select);
-
-			while(res.next())
-			    {				
-				selectName.add(res.getString(1));
-				selectId.add(res.getString(2));
-				
-			    }
-			Data.put(0,selectName);
-			Data.put(1,selectId);
-			
-		    } catch (SQLException e)
-		    {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		    }
-
-		server.Dump dump = new server.Dump();
-		dump.Dump(Data);
-	    }
-
 
     }

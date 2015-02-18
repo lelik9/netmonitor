@@ -12,6 +12,7 @@ import java.util.TimerTask;
 import timers.RequestTimer.RequestTask;
 import Functions.Calculate;
 import Functions.MacTable;
+import Functions.VlanTable;
 import NetMonitor.main;
 
 public class FunctionTimer
@@ -19,7 +20,10 @@ public class FunctionTimer
 	private Connection connection1 = main.getConnect1();
 	private String select;
 	private Statement stmt1;
-	private ResultSet res;
+	private Statement stmt2;
+	private ResultSet res1;
+	private ResultSet res2;
+	private ResultSet res3;
 	private int time;
 	private Timer timer = new Timer(); 
 	private ArrayList<Integer> timers1 = new ArrayList<Integer>();
@@ -41,32 +45,42 @@ public class FunctionTimer
 			try
 			    {
 				//Select device ID for requesting
-				stmt1 = connection1.createStatement();			
+				stmt1 = connection1.createStatement();
+				stmt2 = connection1.createStatement();
+				
+				
 				select = "SELECT templateID FROM templates WHERE timeout = '"+time+"' && functions!=''";
-				res = stmt1.executeQuery(select);
-				while(res.next())
+				res1 = stmt1.executeQuery(select);
+				while(res1.next())
 				    {
-					select = "SELECT deviceID FROM selectdata WHERE templateID = '"+res.getString(1)+"'";
-					res = stmt1.executeQuery(select);
+					select = "SELECT deviceID FROM selectdata WHERE templateID = '"+res1.getString(1)+"'";
+					res1 = stmt1.executeQuery(select);
 				   					
 					//Execute requesting function while devices not over
-					while(res.next())
+					while(res1.next())
 					    {
-						deviceID = res.getString(1);
-						select = "SELECT functions FROM templates WHERE functions!=''";
-						res = stmt1.executeQuery(select);
+						deviceID = res1.getString(1);
+						System.out.println("DeviceID "+deviceID);
+						select = "SELECT functions FROM templates WHERE functions!='' && timeout = '"+time+"'";
+						res3 = stmt2.executeQuery(select);
 						
-						while(res.next())
+						while(res3.next())
 						    {
 							//Executing function for devices
-							switch(res.getString(1))
+							switch(res3.getString(1))
 							{
 							    case "InSpeedCalc":
 								calc.InSpeedCalc(deviceID, time, "InSpeedCalc");
 								break;
+								
 							    case "MacTable":
 								MacTable mac = new MacTable();
 								mac.MacTable(deviceID);
+								break;
+								
+							    case "VlanTable":
+								VlanTable vlan = new VlanTable();
+								vlan.VlanTable(deviceID);
 								break;
 								
 							}
@@ -92,11 +106,11 @@ public class FunctionTimer
 		connection1 = main.getConnect1();
 		stmt1 = connection1.createStatement();
 		select = "SELECT timeout FROM templates WHERE timeout!=0 && functions!=''  GROUP BY timeout";
-		res = stmt1.executeQuery(select);
+		res1 = stmt1.executeQuery(select);
 		
-		 while(res.next())
+		 while(res1.next())
 		     {
-			time =  res.getInt(1);
+			time =  res1.getInt(1);
 			if(!timers1.contains(time))
 			    {
 				timers1.add( time);

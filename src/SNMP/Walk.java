@@ -68,6 +68,7 @@ public class Walk
 		oidNext = oid;
 		GetNext n = GetNext.getInstance();
 		Get g = new Get();
+		n.start();
 		g.start();
 		
 		AllValue.clear();
@@ -79,14 +80,14 @@ public class Walk
 			oidNext = n.getNextOID();
 			//System.out.println("nextOID1= "+oidNext);
 			//System.out.println("nextOID= "+oidNext);
-			g.get(IP, oid);
+			g.get(IP, oid, community);
 			//System.out.println(g.getGetChar());
 			if(g.getGetChar() != null )
 			    {
 				Value = g.getGetChar();
 			//	System.out.println("OID= "+oid);
 			//	System.out.println("Value1 "+Value);
-				if(oidNext!=null )
+				if(oidNext != null )
 				    {
 					tmp = oid.length();
 					index.add(oidNext.substring(tmp+1));
@@ -106,11 +107,12 @@ public class Walk
 				    }
 			//	System.out.println("nextOID2= "+oidNext);
 			//	System.out.println("Value2 "+Value);
-				g.get(IP, oidNext);
+				g.get(IP, oidNext, community);
 				if(g.getGetChar() == null) break;
 				Value = g.getGetChar();
 				tmp = oid.length();
-				index.add(oidNext.substring(tmp+1));
+
+				index.add(oidNext.substring(tmp + 1));
 				AllValue.add(Value);
 			    }
 			

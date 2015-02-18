@@ -11,16 +11,6 @@ import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
 import org.yaml.snakeyaml.Yaml;
 
-
-
-
-
-
-
-
-
-
-import server.remoteFunctions.ButtonSelect;
 import server.remoteFunctions.DeviceDataSelect;
 import server.remoteFunctions.DeviceGroupSelect;
 import DB.Connect;
@@ -29,9 +19,13 @@ import DB.select.GetConfInfo;
 import DB.select.GetDeviceName;
 import DB.select.GetIntInfo;
 import DB.select.GetMac;
+import DB.select.GetSNMP;
+import DB.select.GetTemplatesInfo;
+import DB.select.GetUsers;
 import DB.select.GetVlan;
 import DB.update.DevGroupUpdate;
 import DB.update.DeviceUpdate;
+import DB.update.TemplateUpdate;
 import Functions.FindDevice;
 import Functions.MacTable;
 import SNMP.GetNext;
@@ -84,15 +78,11 @@ public class ServerHandler implements IoHandler
 		{
 		    
 		    case "test":
-			System.out.println("all work!");
+			String test = "Hi!";
+			System.out.println(test);
+			session.write(test);
 			break;
 
-		    case "button":
-			ButtonSelect butSelect = new ButtonSelect();
-			butSelect.ButtonSelect(data.get("windowName"));
-			session.write(dump);
-			System.out.println(dump);
-			break;
 			
 		    case "groups":
 			DeviceGroupSelect devSelect = new DeviceGroupSelect();
@@ -131,6 +121,38 @@ public class ServerHandler implements IoHandler
 			session.write(dump);
 			break;
 			
+			/**
+			 * Получение информации по шаблонам
+			 */
+		    case "Templates":
+			GetTemplatesInfo templateInfo = new GetTemplatesInfo();
+			templateInfo.GetTemplatesInfo(data);		
+			session.write(dump);
+			break;
+			
+			/**
+			 * Изменение шаблонов и элементов
+			 */
+		    case "templateUpdate":
+			TemplateUpdate templateUpdate = new TemplateUpdate();
+			templateUpdate.TemplateUpdate(data);
+			session.write(dump);
+			break;
+			
+		    case "getSNMP-Func":
+			GetSNMP getSNMP = new GetSNMP();
+			getSNMP.GetSNMP(data);
+			session.write(dump);
+			break;
+			
+			/**
+			 * Получение информации о пользователях
+			 */
+		    case "getUsers":
+			GetUsers getUsers = new GetUsers();
+			getUsers.GetUsers(data);
+			session.write(dump);
+			break;
 
 	//OLD		
 		    case "vlantable":

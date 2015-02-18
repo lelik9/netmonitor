@@ -14,7 +14,11 @@ import org.yaml.snakeyaml.Yaml;
 
 import server.ServerHandler;
 import NetMonitor.main;
-
+/**
+ * Изменение групп устройств
+ * @author Alex
+ *
+ */
 public class DevGroupUpdate
     {
 	private Connection connection1;
@@ -23,7 +27,11 @@ public class DevGroupUpdate
 	private ResultSet res;
 	private Map<Integer, List <String>> Data = new HashMap<Integer, List <String>>();
 	private List<String> result = new ArrayList<>();
-	
+	/**
+	 * В data с ключем "update" передается действие с группой (insert - добавление; update - обновление информации; delete - удаление группы)
+	 * Ключ "name" содержит имя группы
+	 * @param data
+	 */
 	public void DevGroupUpdate(Map<String, String> data)
 	    {
 		switch(data.get("update"))
@@ -42,7 +50,10 @@ public class DevGroupUpdate
 			
 		}
 	    }
-	
+	/**
+	 * Передается Имя группы для добавления
+	 * @param groupName
+	 */
 	private void Insert(String groupName)
 	    {
 		connection1 = main.getConnect1();
@@ -62,10 +73,15 @@ public class DevGroupUpdate
 			Data.put(0, result);
 			e.printStackTrace();
 		    }
-		Dump();
+		server.Dump dump = new server.Dump();
+		dump.Dump(Data);
 		
 	    }
-	
+	/**
+	 * В data2 Хранятся новое и старое имя группы
+	 * ключ new - новое имя; old - старое.
+	 * @param data2
+	 */
 	private void Update(Map<String, String> data2)
 	    {
 		connection1 = main.getConnect1();
@@ -85,10 +101,14 @@ public class DevGroupUpdate
 			Data.put(0, result);
 			e.printStackTrace();
 		    }
-		Dump();
+		server.Dump dump = new server.Dump();
+		dump.Dump(Data);
 		
 	    }
-	
+	/**
+	 * Передается Имя группы для удаления
+	 * @param groupName
+	 */
 	private void Delete(String groupName)
 	    {
 		connection1 = main.getConnect1();
@@ -118,20 +138,10 @@ public class DevGroupUpdate
 			Data.put(0, result);
 			e.printStackTrace();
 		    }
-		Dump();
+		server.Dump dump = new server.Dump();
+		dump.Dump(Data);
 		
 	    }
 	
-	public void Dump()
-	    {
-		ServerHandler srv = new ServerHandler();
-		
-		
-		DumperOptions options = new DumperOptions();
-		Yaml yaml = new Yaml(options);
-		int i = yaml.dump(Data).length();
-		options.setWidth(i);
-		srv.setDump(yaml.dump(Data));
-	    }
 
     }

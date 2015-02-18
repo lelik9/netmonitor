@@ -26,9 +26,9 @@ import org.snmp4j.transport.DefaultUdpTransportMapping;
 
 public class Get implements ResponseListener {
     
-    private final static String SNMP_COMMUNITY = "public";
-    private final static int    SNMP_RETRIES   = 1;
-    private final static long   SNMP_TIMEOUT   = 100;
+  //  private static  String SNMP_COMMUNITY = "public@2" ;
+    private final static int    SNMP_RETRIES   = 2;
+    private final static long   SNMP_TIMEOUT   = 100L;
     
     private Snmp snmp = null;
     private TransportMapping transport = null;
@@ -58,9 +58,9 @@ public class Get implements ResponseListener {
          response = event.getResponse();
     //    System.out.println(response.get(0).toValueString());
 
-	    
         if (response != null) 
         {
+            
             synchronized (response)
     	    {	
             	if(response.get(0).toValueString().equals("Null")){setGetChar(null);}
@@ -77,11 +77,11 @@ public class Get implements ResponseListener {
     }
 
     
-    public void get(String IP, String OID) 
+    public void get(String IP, String OID, String community) 
     throws IOException 
     {
-        Target t = getTarget(IP);
-
+        Target t = getTarget(IP, community);
+       // SNMP_COMMUNITY = community;
             send(t, OID);
 
         while (!requests.isEmpty()) 
@@ -109,7 +109,7 @@ public class Get implements ResponseListener {
    
   
     
-    private Target getTarget(String address) {
+    private Target getTarget(String address, String SNMP_COMMUNITY) {
         Address targetAddress = GenericAddress.parse(address);
         CommunityTarget target = new CommunityTarget();
         target.setCommunity(new OctetString(SNMP_COMMUNITY));

@@ -24,9 +24,16 @@ public class DeviceDataSelect
 	private ResultSet res;
 	private List <String> oidIndex = new ArrayList();
 	private Map<Integer, List <String>> Data = new HashMap<Integer, List <String>>();
-	
-	public void DeviceDataSelect(Map<String, String> data) throws SQLException
+	/**
+	 * В data Содержится имя девайса и названия элементов данных для получения инфы по устройству.
+	 * Ключи для data: "devName" - имя девайса, "0..n" - названия элементов данных.
+	 * Пример: devName:switch, 0:interface name, 1:mac address
+	 * @param data
+	 */
+	public void DeviceDataSelect(Map<String, String> data)
 	    {
+		
+		
 		String dataKeys = "";
 		String key = null;
 		String devName;
@@ -35,11 +42,17 @@ public class DeviceDataSelect
 		
 		Yaml yaml = new Yaml();
 		connection1 = main.getConnect1();
-		stmt1 = connection1.createStatement();
+		try
+		    {
+			stmt1 = connection1.createStatement();
+
 		
 		devName = data.get("devName");
 		select = "SELECT deviceID, GroupID FROM devices WHERE DeviceName='"+devName+"'";
-		res = stmt1.executeQuery(select);
+
+			res = stmt1.executeQuery(select);
+
+
 		res.next(); 
 		devId = res.getString(1);
 		groupId = res.getString(2);
@@ -65,7 +78,9 @@ public class DeviceDataSelect
 				if(data.get(""+n+"") != null)
 				    {
 					select = "SELECT data from group_"+groupId+"_data WHERE name='"+data.get(""+n+"")+"' && OIDindex='"+oidIndex.get(i)+"' && deviceID='"+devId+"'";
-					res = stmt1.executeQuery(select);
+
+						res = stmt1.executeQuery(select);
+
 					while(res.next())
 					    {
 						if(res.getString(1) == null) {
@@ -76,29 +91,26 @@ public class DeviceDataSelect
 						    }
 
 					    }
-										
+		
 				    }
 				n++;
 			    }
+			if(selectInf.size() > 0)
 			Data.put(i,selectInf);
 
 			i++;
 		    }
 
-		Dump();
+		    } catch (SQLException e)
+		    {
+			// TODO Auto-generated catch block
+			System.out
+				.println(e);
+			e.printStackTrace();
+		    }	
+		server.Dump dump = new server.Dump();
+		dump.Dump(Data);
 		
-	    }
-	
-	public void Dump()
-	    {
-		ServerHandler srv = new ServerHandler();
-		
-		
-		DumperOptions options = new DumperOptions();
-		Yaml yaml = new Yaml(options);
-		int i = yaml.dump(Data).length();
-		options.setWidth(i);
-		srv.setDump(yaml.dump(Data));
 	    }
 
     }
