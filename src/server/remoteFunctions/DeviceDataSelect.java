@@ -48,17 +48,17 @@ public class DeviceDataSelect
 
 		
 		devName = data.get("devName");
-		select = "SELECT deviceID, GroupID FROM devices WHERE DeviceName='"+devName+"'";
+		select = "SELECT deviceID FROM devices WHERE DeviceName='"+devName+"'";
 
 			res = stmt1.executeQuery(select);
 
 
 		res.next(); 
 		devId = res.getString(1);
-		groupId = res.getString(2);
+
 		
 		//Получаем OID индексы, для формирования соответствий параметров 
-		select = "SELECT OIDindex from group_"+groupId+"_data WHERE deviceID='"+devId+"' GROUP BY OIDindex";
+		select = "SELECT OIDindex from device_data WHERE deviceID='"+devId+"' GROUP BY OIDindex";
 		res = stmt1.executeQuery(select);
 		while(res.next())
 		    {
@@ -77,7 +77,7 @@ public class DeviceDataSelect
 			    {
 				if(data.get(""+n+"") != null)
 				    {
-					select = "SELECT data from group_"+groupId+"_data WHERE name='"+data.get(""+n+"")+"' && OIDindex='"+oidIndex.get(i)+"' && deviceID='"+devId+"'";
+					select = "SELECT data from device_data WHERE name='"+data.get(""+n+"")+"' && OIDindex='"+oidIndex.get(i)+"' && deviceID='"+devId+"'";
 
 						res = stmt1.executeQuery(select);
 

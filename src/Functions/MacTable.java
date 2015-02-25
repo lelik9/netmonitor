@@ -113,7 +113,7 @@ public class MacTable
 				walk.walk(IP, dot1dBasePortIfIndex+"."+Port.get(n), community);//Get interface index
 				PortIndex.addAll(walk.getAllValue());
 						
-				sel = "SELECT data FROM group_"+group+"_data join templates where templates.OIDname='ifDescr' && group_"+group+"_data.name=templates.name && "
+				sel = "SELECT data FROM device_data join templates where templates.OIDname='ifDescr' && group_"+group+"_data.name=templates.name && "
 					+ "group_"+group+"_data.OIDindex= '"+PortIndex.get(n)+"' && group_"+group+"_data.deviceID = '"+device+"' "; //Get interface name
 				ResultSet res2 = stmt1.executeQuery(sel);
 				res2.next();

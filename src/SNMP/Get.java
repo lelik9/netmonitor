@@ -26,8 +26,7 @@ import org.snmp4j.transport.DefaultUdpTransportMapping;
 
 public class Get implements ResponseListener {
     
-  //  private static  String SNMP_COMMUNITY = "public@2" ;
-    private final static int    SNMP_RETRIES   = 2;
+    private final static int    SNMP_RETRIES   = 1;
     private final static long   SNMP_TIMEOUT   = 100L;
     
     private Snmp snmp = null;
@@ -38,7 +37,6 @@ public class Get implements ResponseListener {
     private String GetChar;
     
     private PDU response = new PDU();
-
 
     
     public String getGetChar() {
@@ -55,23 +53,24 @@ public class Get implements ResponseListener {
     {
 
         Integer32 requestId = event.getRequest().getRequestID();
-         response = event.getResponse();
-    //    System.out.println(response.get(0).toValueString());
+        PDU response = event.getResponse();
+        if (response != null) {
 
-        if (response != null) 
-        {
-            
-            synchronized (response)
-    	    {	
-            	if(response.get(0).toValueString().equals("Null")){setGetChar(null);}
-            	else{
-            	    setGetChar(response.get(0).toValueString());
-            	}
+        	if(response.get(0).toValueString().equals("Null")){setGetChar(null);}
+        	else{
 
+        	    setGetChar(response.get(0).toValueString());
+        	}
+
+            return;
+        } else {
+            synchronized (requests) {
+                if (requests.contains(requestId)) {
+                    System.out.println("Timeout exceeded");
+                }
+            }
         }
-	    }
-        synchronized (requests) 
-        {
+        synchronized (requests) {
             requests.remove(requestId);
         }
     }
@@ -81,20 +80,19 @@ public class Get implements ResponseListener {
     throws IOException 
     {
         Target t = getTarget(IP, community);
-       // SNMP_COMMUNITY = community;
-            send(t, OID);
+           
+        send(t, OID);
 
         while (!requests.isEmpty()) 
             {
             try {
-        		Thread.sleep(100);
+        		Thread.sleep(100L);
                 }
             catch (InterruptedException e) 
         	{
         	    e.printStackTrace();
         	}
             }
-
     }
     
     private void send(Target target, String oid) throws IOException {

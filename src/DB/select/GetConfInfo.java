@@ -44,7 +44,9 @@ public class GetConfInfo
 	    }
 	
 	
-	//Получаем все группы устройств и дейвасы которые в них входят
+	/**
+	 * Получаем все группы устройств и дейвасы которые в них входят
+	 */
 	private void DeviceFullInfo()
 	    {
 		connection1 = main.getConnect1();
@@ -82,6 +84,9 @@ public class GetConfInfo
 
 	    }
 	
+	/**
+	 * Информация о группах устройств - ID и имя
+	 */
 	private void GroupInfo()
 	    {
 		connection1 = main.getConnect1();
@@ -114,6 +119,10 @@ public class GetConfInfo
 		dump.Dump(Data);
 	    }
 	
+	/**
+	 * Информация о устройствах  - ID и имя 
+	 * @param groupName - имя группы в которой находятся устройства
+	 */
 	private void DeviceInfo(String groupName)
 	    {
 		connection1 = main.getConnect1();

@@ -40,22 +40,63 @@ public class DeviceUpdate
 		}
 	}
 	
+	/**
+	 * Изменение информации устройства
+	 * @param data
+	 */
 	private void Update(Map<String, String> data)
-	    {
-		
-	    }
-	
-	private void Delete(String deviceName)
 	    {
 		connection1 = main.getConnect1();
 		try
 		    {
 			stmt1 = connection1.createStatement();
 				
-				select = "DELETE FROM devices WHERE DeviceName = '"+deviceName+"'";
+				select = "UPDATE devices SET DeviceName = '"+data.get("name")+"' WHERE IPaddress = '"+data.get("ip")+"'";
 				stmt1.executeUpdate(select);
-				result.add("Устройство удалено");
+				result.add("Настройки изменены");
 				Data.put(0, result);
+			    
+			
+			
+		    } catch (SQLException e)
+		    {
+			// TODO Auto-generated catch block
+			result.add("FAIL");
+			Data.put(0, result);
+			e.printStackTrace();
+		    }
+		server.Dump dump = new server.Dump();
+		dump.Dump(Data);
+	    
+	
+	    }
+	
+	/**
+	 * Удаление устройства
+	 * @param deviceName
+	 */
+	private void Delete(String deviceName)
+	    {
+		connection1 = main.getConnect1();
+		try
+		    {
+			stmt1 = connection1.createStatement();
+			
+			select = "SELECT DeviceID FROM devices WHERE DeviceName = '"+deviceName+"'";
+			res = stmt1.executeQuery(select);
+			res.next();
+			String deviceID = res.getString(1);
+				
+			select = "DELETE FROM device_data WHERE DeviceID = '"+deviceID+"'";
+			stmt1.executeUpdate(select);
+			
+			select = "DELETE FROM selectdata WHERE DeviceID = '"+deviceID+"'";
+			stmt1.executeUpdate(select);
+			
+			select = "DELETE FROM devices WHERE DeviceName = '"+deviceName+"'";
+			stmt1.executeUpdate(select);
+			result.add("Устройство удалено");
+			Data.put(0, result);
 			    
 			
 			

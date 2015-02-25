@@ -73,10 +73,15 @@ public class Walk
 		
 		AllValue.clear();
 		index.clear();
+
+		Long firstTimestamp = System.currentTimeMillis();
+		System.out.println(firstTimestamp);
 		
+
+
 		while(oidNext != null)
 		    {
-			n.GetNext(IP, oidNext, oid, community);  //Get interface Index
+			n.GetNext(IP, oidNext, oid, community); 
 			oidNext = n.getNextOID();
 			//System.out.println("nextOID1= "+oidNext);
 			//System.out.println("nextOID= "+oidNext);
@@ -117,7 +122,10 @@ public class Walk
 			    }
 			
 		    }
-
+		Long lastTimestamp = System.currentTimeMillis();
+		System.out.println(lastTimestamp);
+		long tmp2 = (lastTimestamp - firstTimestamp)/ 1000;
+	            System.out.println("request time = "+tmp2);
 
 	    }
 	    

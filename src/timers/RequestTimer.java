@@ -43,19 +43,45 @@ public class RequestTimer
 					res = stmt1.executeQuery(select);
 					while(res.next())
 					    {
-						select = "SELECT deviceID FROM selectdata WHERE templateID = '"+res.getString(1)+"'";
+						String templateID = res.getString(1);
+						select = "SELECT deviceID FROM selectdata WHERE templateID = '"+templateID+"'";
 						res = stmt1.executeQuery(select);
 					   					
 						//Execute requesting thread while devices not over
 						while(res.next())
 						    {
-							RequestThread request = new RequestThread(res.getString(1), time);
-							System.out
-								.println(res.getString(1));
-						//	Universal uni = new Universal();
-						//	uni.Universal(res.getString(1), time);
-							request.start();
+							if(res.getString(1) != null)
+							    {
+								RequestThread request = new RequestThread(res.getString(1), time);
+								System.out
+									.println(res.getString(1));
+
+								request.start();
+							    }
 						    }
+						
+						select = "SELECT groupID FROM selectdata WHERE templateID = '"+templateID+"'";
+						res = stmt1.executeQuery(select);
+						
+						while(res.next())
+						    {
+							if(res.getString(1) != null)
+							    {
+								select = "SELECT deviceID FROM devices WHERE GroupID = '"+res.getString(1)+"'";
+								res = stmt1.executeQuery(select);
+								
+								while(res.next())
+								    {
+									RequestThread request = new RequestThread(res.getString(1), time);
+									System.out
+										.println(res.getString(1));
+
+									request.start();
+								    }
+								
+							    }
+						    }
+						
 					    }
 				    } catch (SQLException e)
 				    {

@@ -12,11 +12,10 @@ import org.apache.mina.core.session.IoSession;
 import org.yaml.snakeyaml.Yaml;
 
 import server.remoteFunctions.DeviceDataSelect;
-import server.remoteFunctions.DeviceGroupSelect;
 import DB.Connect;
 import DB.select.GetArp;
 import DB.select.GetConfInfo;
-import DB.select.GetDeviceName;
+import DB.select.GetDeviceAndGroup;
 import DB.select.GetIntInfo;
 import DB.select.GetMac;
 import DB.select.GetSNMP;
@@ -68,7 +67,6 @@ public class ServerHandler implements IoHandler
 	        GetVlan v =new GetVlan();
 	        GetMac m = new GetMac();
 
-	        GetDeviceName dn = new GetDeviceName();
 	        
 		Yaml yaml = new Yaml();
 		System.out.println(message);
@@ -83,10 +81,12 @@ public class ServerHandler implements IoHandler
 			session.write(test);
 			break;
 
-			
-		    case "groups":
-			DeviceGroupSelect devSelect = new DeviceGroupSelect();
-			devSelect.DeviceGroupSelect();
+			/**
+			 * Получение информации о устройствах и группах
+			 */
+		    case "devGroups":
+			GetDeviceAndGroup devSelect = new GetDeviceAndGroup();
+			devSelect.GetDeviceAndGroup(data);
 			session.write(dump);
 			System.out.println(dump);
 			break;
@@ -97,6 +97,9 @@ public class ServerHandler implements IoHandler
 			session.write(dump);
 			break;
 			
+			/**
+			 * Обнаружение и добавление в БД устройств
+			 */
 		    case "DiscoverDevice":
 			FindDevice findDev = new FindDevice();
 			findDev.FindDevice(data);
@@ -115,6 +118,9 @@ public class ServerHandler implements IoHandler
 			session.write(dump);
 			break;
 			
+			/**
+			 * Удаление устройства или изменение его настроек
+			 */
 		    case "DevUpdate":
 			DeviceUpdate devUpdate = new DeviceUpdate();
 			devUpdate.DeviceUpdate(data);		
@@ -153,6 +159,7 @@ public class ServerHandler implements IoHandler
 			getUsers.GetUsers(data);
 			session.write(dump);
 			break;
+			
 
 	//OLD		
 		    case "vlantable":
@@ -170,12 +177,6 @@ public class ServerHandler implements IoHandler
 			session.write(dump);
 			break;
 			
-			
-		    case "devices":
-			dn.GetDeviceName(data.get("device"), data.get("group"));
-			System.out.println(dump);
-			session.write(dump);
-			break;
 			
 		    case "exit":
 			session.close();

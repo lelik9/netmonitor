@@ -91,7 +91,7 @@ public class Universal
 		        System.out.println(index);
 		        System.out.println(Value.size());
 		        //Delete data from DB
-		        ins = "DELETE  FROM group_"+group+"_data WHERE name = '"+key+"' && deviceID='"+deviceID+"'";
+		        ins = "DELETE  FROM device_data WHERE name = '"+key+"' && deviceID='"+deviceID+"'";
 		        stmt3.executeUpdate(ins);
 	        	//Insert data to DB
 		        n=0;
@@ -99,7 +99,7 @@ public class Universal
 	        	    {
 
 	        		 //Insert in group Table
-	        		 ins = "INSERT INTO group_"+group+"_data (deviceID, data, OIDindex, name, metric) VALUES "
+	        		 ins = "INSERT INTO device_data (deviceID, data, OIDindex, name, metric) VALUES "
 	        		 	+ "('"+deviceID+"','"+Value.get(n)+"', '"+index.get(n)+"','"+key+"', '"+metric+"')";
 	        		 stmt3.executeUpdate(ins);
 	        		

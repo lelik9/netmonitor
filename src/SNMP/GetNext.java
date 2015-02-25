@@ -29,7 +29,7 @@ public class GetNext implements ResponseListener {
 
    // private final static String SNMP_COMMUNITY = "public";
     private final static int    SNMP_RETRIES   = 2;
-    private final static long   SNMP_TIMEOUT   = 1500;
+    private final static long   SNMP_TIMEOUT   = 5;
 
     
     private Snmp snmp = null;
